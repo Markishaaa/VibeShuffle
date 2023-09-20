@@ -2,32 +2,44 @@ package rs.markisha.vibeshuffle.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import rs.markisha.vibeshuffle.R;
-import rs.markisha.vibeshuffle.adapters.PlaylistAdapter;
 import rs.markisha.vibeshuffle.payload.PlaybackDetailsBuilder;
 import rs.markisha.vibeshuffle.payload.PlaylistDetailsBuilder;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
-import rs.markisha.vibeshuffle.utils.callbacks.PlaylistDetailsListener;
 import rs.markisha.vibeshuffle.utils.network.SpotifyController;
 
-public class MainActivity extends AppCompatActivity implements PlaybackDetailsListener, PlaylistDetailsListener {
+public class MainActivity extends AppCompatActivity implements PlaybackDetailsListener {
 
     private SpotifyController spotifyController;
+
+    private PlaylistDetailsBuilder chillPlaylist;
+    private PlaylistDetailsBuilder aggressivePlaylist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent i = getIntent();
+        checkPlaylist(i);
+
+        Button btnChoosePlaylists = findViewById(R.id.btnChoosePlaylists);
+
+        btnChoosePlaylists.setOnClickListener(view -> {
+            Intent in = new Intent(MainActivity.this, ChoosePlaylistsActivity.class);
+            startActivity(in);
+            finish();
+        });
     }
 
     @Override
@@ -38,9 +50,42 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
         if (i.hasExtra("TOKEN")) {
             String token = i.getStringExtra("TOKEN");
 
-            spotifyController = new SpotifyController(this, token);
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("access_token", token);
+            editor.apply();
 
-            spotifyController.getUserPlaylists(this);
+            spotifyController = SpotifyController.getInstance(this, token);
+
+            checkPlaylist(i);
+        }
+    }
+
+    private void checkPlaylist(Intent i) {
+        if (!i.hasExtra("chillPlaylist")) {
+            Intent ni = new Intent(this, ChoosePlaylistsActivity.class);
+            startActivity(ni);
+            finish();
+        } else {
+            chillPlaylist = (PlaylistDetailsBuilder) i.getSerializableExtra("chillPlaylist");
+            aggressivePlaylist = (PlaylistDetailsBuilder) i.getSerializableExtra("aggressivePlaylist");
+
+            if (chillPlaylist != null && aggressivePlaylist != null &&
+                    chillPlaylist.getName() != null && aggressivePlaylist.getName() != null) {
+                TextView tvChillPlaylist = findViewById(R.id.chillPlaylist2);
+                tvChillPlaylist.setText(chillPlaylist.getName());
+
+                TextView tvAggressivePlaylist = findViewById(R.id.aggressivePlaylist2);
+                tvAggressivePlaylist.setText(aggressivePlaylist.getName());
+            }
+        }
+    }
+
+    public void onTextClick(View view) {
+        if (view.getId() == R.id.chillPlaylist2) {
+            Log.d("mainact", "chill");
+        } else {
+            Log.d("mainact", "agro");
         }
     }
 
@@ -62,19 +107,5 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
         } else {
             spotifyController.playAlbum("spotify:album:0mwmLhhRlrzg8NWohsXH6h", 0, 0);
         }
-    }
-
-
-    @Override
-    public void onPlaylistDetailsRecieved(List<PlaylistDetailsBuilder> playlists) {
-        PlaylistAdapter adapter = new PlaylistAdapter(this, playlists);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner sChillPlaylist = findViewById(R.id.spinnerChillPlaylist);
-        sChillPlaylist.setAdapter(adapter);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Spinner sAggressivePlaylist = findViewById(R.id.spinnerAggressivePlaylist);
-        sAggressivePlaylist.setAdapter(adapter);
     }
 }

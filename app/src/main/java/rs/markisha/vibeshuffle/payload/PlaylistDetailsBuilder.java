@@ -1,8 +1,9 @@
 package rs.markisha.vibeshuffle.payload;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class PlaylistDetailsBuilder {
+public class PlaylistDetailsBuilder implements Serializable {
 
     private String id;
     private String name;

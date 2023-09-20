@@ -6,47 +6,67 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
+    <Button
+        android:id="@+id/btnChoosePlaylists"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Back to playlist selection"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/chillPlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="32dp"
-        android:text="Chill Playlist"
+        android:layout_marginTop="24dp"
+        android:text="Your chill playlist"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/btnChoosePlaylists"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/chillPlaylist2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="8dp"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chillPlaylist"
+        android:textColor="@color/teal_200"
+        android:clickable="true"
+        android:onClick="onTextClick"
+        android:focusable="true"/>
 
     <TextView
         android:id="@+id/aggressivePlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="32dp"
-        android:text="Aggressive Playlist"
+        android:layout_marginTop="42dp"
+        android:text="Your aggressive playlist"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerChillPlaylist" />
+        app:layout_constraintTop_toBottomOf="@+id/chillPlaylist2"
+        tools:ignore="HardcodedText" />
 
-    <Spinner
-        android:id="@+id/spinnerChillPlaylist"
-        android:layout_width="330dp"
+    <TextView
+        android:id="@+id/aggressivePlaylist2"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="44dp"
         android:layout_marginTop="8dp"
-        android:minHeight="48dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chillPlaylist" />
-
-    <Spinner
-        android:id="@+id/spinnerAggressivePlaylist"
-        android:layout_width="330dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:minHeight="48dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/aggressivePlaylist" />
+        app:layout_constraintTop_toBottomOf="@+id/aggressivePlaylist"
+        android:textColor="@color/teal_200"
+        android:clickable="true"
+        android:onClick="onTextClick"
+        android:focusable="true" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

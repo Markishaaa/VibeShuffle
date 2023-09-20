@@ -2,6 +2,8 @@ package rs.markisha.vibeshuffle.utils.network;
 
 import android.content.Context;
 
+import java.io.Serializable;
+
 import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaylistDetailsListener;
 import rs.markisha.vibeshuffle.utils.network.managers.AlbumManager;
@@ -10,14 +12,23 @@ import rs.markisha.vibeshuffle.utils.network.managers.PlaylistManager;
 
 public class SpotifyController {
 
+    private static SpotifyController instance;
+
     private final PlaybackManager playbackManager;
     private final AlbumManager albumManager;
     private final PlaylistManager playlistManager;
 
-    public SpotifyController(Context context, String accessToken) {
+    private SpotifyController(Context context, String accessToken) {
         playbackManager = new PlaybackManager(context, accessToken);
         albumManager = new AlbumManager(context, accessToken);
         playlistManager = new PlaylistManager(context, accessToken);
+    }
+
+    public static synchronized SpotifyController getInstance(Context context, String accessToken) {
+        if (instance == null) {
+            instance = new SpotifyController(context, accessToken);
+        }
+        return instance;
     }
 
     public void playAlbum(String albumUri, int position, int positionMs) {
