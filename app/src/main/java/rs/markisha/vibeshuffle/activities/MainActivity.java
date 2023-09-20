@@ -5,14 +5,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import rs.markisha.vibeshuffle.R;
+import rs.markisha.vibeshuffle.adapters.PlaylistAdapter;
 import rs.markisha.vibeshuffle.payload.PlaybackDetailsBuilder;
+import rs.markisha.vibeshuffle.payload.PlaylistDetailsBuilder;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
+import rs.markisha.vibeshuffle.utils.callbacks.PlaylistDetailsListener;
 import rs.markisha.vibeshuffle.utils.network.SpotifyController;
 
-public class MainActivity extends AppCompatActivity implements PlaybackDetailsListener {
+public class MainActivity extends AppCompatActivity implements PlaybackDetailsListener, PlaylistDetailsListener {
 
     private SpotifyController spotifyController;
 
@@ -30,11 +38,9 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
         if (i.hasExtra("TOKEN")) {
             String token = i.getStringExtra("TOKEN");
 
-            Log.d("scopes", token);
-
             spotifyController = new SpotifyController(this, token);
 
-            spotifyController.getCurrentPlaybackState(this);
+            spotifyController.getUserPlaylists(this);
         }
     }
 
@@ -56,5 +62,19 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
         } else {
             spotifyController.playAlbum("spotify:album:0mwmLhhRlrzg8NWohsXH6h", 0, 0);
         }
+    }
+
+
+    @Override
+    public void onPlaylistDetailsRecieved(List<PlaylistDetailsBuilder> playlists) {
+        PlaylistAdapter adapter = new PlaylistAdapter(this, playlists);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner sChillPlaylist = findViewById(R.id.spinnerChillPlaylist);
+        sChillPlaylist.setAdapter(adapter);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Spinner sAggressivePlaylist = findViewById(R.id.spinnerAggressivePlaylist);
+        sAggressivePlaylist.setAdapter(adapter);
     }
 }

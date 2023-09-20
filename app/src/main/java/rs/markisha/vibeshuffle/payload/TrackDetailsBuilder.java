@@ -2,6 +2,7 @@ package rs.markisha.vibeshuffle.payload;
 
 public class TrackDetailsBuilder {
 
+    private String id;
     private String name;
     private String uri;
     private String type;
@@ -11,7 +12,8 @@ public class TrackDetailsBuilder {
     private String albumName;
     private String imageUrl;
 
-    public TrackDetailsBuilder(String name, String uri, String type, int trackNumber, int durationMs, String albumName, String imageUrl) {
+    public TrackDetailsBuilder(String id, String name, String uri, String type, int trackNumber, int durationMs, String albumName, String imageUrl) {
+        this.id = id;
         this.name = name;
         this.uri = uri;
         this.type = type;
