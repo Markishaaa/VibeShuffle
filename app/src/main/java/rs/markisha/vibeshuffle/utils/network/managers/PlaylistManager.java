@@ -1,6 +1,7 @@
 package rs.markisha.vibeshuffle.utils.network.managers;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -11,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +34,7 @@ public class PlaylistManager extends SpotifyApiHelper {
     }
 
     public void getPlaylist(String playlistId, PlaylistDetailsListener listener) {
-        String playbackStateUrl = BASE_URL + "me/playlists/" + playlistId;
+        String playbackStateUrl = BASE_URL + "playlists/" + playlistId;
 
         JsonObjectRequest playbackStateRequest = new JsonObjectRequest(
                 Request.Method.GET,
@@ -43,7 +43,7 @@ public class PlaylistManager extends SpotifyApiHelper {
                 response -> {
                     PlaylistDetailsBuilder playlistDetails = responseParser.parsePlaylistResponse(response);
 
-//                    listener.onPlaylistDetailsRecieved(playlistDetails);
+                    listener.onPlaylistDetailsReceived(playlistDetails);
                 },
                 error -> {
                 }
@@ -81,7 +81,7 @@ public class PlaylistManager extends SpotifyApiHelper {
                                 playlists.add(playlistDetails);
                             }
 
-                            listener.onPlaylistDetailsRecieved(playlists);
+                            listener.onUserPlaylistsDetailsReceived(playlists);
 
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -89,6 +89,7 @@ public class PlaylistManager extends SpotifyApiHelper {
                     }
                 },
                 error -> {
+                    Log.d("playlistActiv", "why you do this?!?!!?!!?");
                 }
         ) {
             @Override

@@ -24,14 +24,12 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
 
     private PlaylistDetailsBuilder chillPlaylist;
     private PlaylistDetailsBuilder aggressivePlaylist;
+    private boolean started = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Intent i = getIntent();
-        checkPlaylist(i);
 
         Button btnChoosePlaylists = findViewById(R.id.btnChoosePlaylists);
 
@@ -56,17 +54,18 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
             editor.apply();
 
             spotifyController = SpotifyController.getInstance(this, token);
-
-            checkPlaylist(i);
         }
+        checkPlaylist(i);
     }
 
     private void checkPlaylist(Intent i) {
         if (!i.hasExtra("chillPlaylist")) {
+            Log.d("hasplaylist", "no");
             Intent ni = new Intent(this, ChoosePlaylistsActivity.class);
             startActivity(ni);
             finish();
         } else {
+            Log.d("hasplaylist", "yes");
             chillPlaylist = (PlaylistDetailsBuilder) i.getSerializableExtra("chillPlaylist");
             aggressivePlaylist = (PlaylistDetailsBuilder) i.getSerializableExtra("aggressivePlaylist");
 
@@ -82,11 +81,19 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
     }
 
     public void onTextClick(View view) {
+        Intent i = new Intent(this, PlaylistActivity.class);
+        Log.d("hasplaylist", "started");
+
         if (view.getId() == R.id.chillPlaylist2) {
-            Log.d("mainact", "chill");
-        } else {
-            Log.d("mainact", "agro");
+            Log.d("hasplaylist", "????");
+            i.putExtra("playlist", chillPlaylist);
+        } else if (view.getId() == R.id.aggressivePlaylist2) {
+            Log.d("hasplaylist", "??!@!@!?");
+            i.putExtra("playlist", aggressivePlaylist);
         }
+
+        startActivity(i);
+        finish();
     }
 
     @Override

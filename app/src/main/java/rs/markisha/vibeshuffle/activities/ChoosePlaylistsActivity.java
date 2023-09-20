@@ -25,6 +25,8 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
     private PlaylistDetailsBuilder aggressivePlaylist;
     private SpotifyController spotifyController;
 
+    private Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,18 +39,19 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
 
         SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String token = sharedPreferences.getString("access_token", "");
-        Log.d("playlistActiv", token);
         spotifyController = SpotifyController.getInstance(this, token);
 
         spotifyController.getUserPlaylists(this);
     }
 
     @Override
-    public void onPlaylistDetailsRecieved(List<PlaylistDetailsBuilder> playlists) {
+    public void onUserPlaylistsDetailsReceived(List<PlaylistDetailsBuilder> playlists) {
         if (playlists.isEmpty()) {
             Log.d("playlistActiv", "???????");
             return;
         }
+
+        Log.d("playlistActiv", playlists.get(0).getName());
 
         PlaylistAdapter adapter = new PlaylistAdapter(this, playlists);
 
@@ -63,17 +66,28 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
         Button btnChoosePlaylists = findViewById(R.id.btnChoosePlaylists);
 
         btnChoosePlaylists.setOnClickListener(view -> {
-            chillPlaylist = (PlaylistDetailsBuilder) sChillPlaylist.getSelectedItem();
-            aggressivePlaylist = (PlaylistDetailsBuilder) sAggressivePlaylist.getSelectedItem();
+            String chillPlaylistId = ((PlaylistDetailsBuilder) sChillPlaylist.getSelectedItem()).getId();
+            String aggressivePlaylistId = ((PlaylistDetailsBuilder) sAggressivePlaylist.getSelectedItem()).getId();
 
-            Intent i = new Intent(ChoosePlaylistsActivity.this, MainActivity.class);
+            intent = new Intent(ChoosePlaylistsActivity.this, MainActivity.class);
 
-            i.putExtra("chillPlaylist", chillPlaylist);
-            i.putExtra("aggressivePlaylist", aggressivePlaylist);
+            spotifyController.getPlaylist(chillPlaylistId, this);
+            spotifyController.getPlaylist(aggressivePlaylistId, this);
+        });
+    }
 
-            startActivity(i);
+    @Override
+    public void onPlaylistDetailsReceived(PlaylistDetailsBuilder playlist) {
+        if (chillPlaylist == null) {
+            chillPlaylist = playlist;
+            intent.putExtra("chillPlaylist", chillPlaylist);
+        } else {
+            aggressivePlaylist = playlist;
+            intent.putExtra("aggressivePlaylist", aggressivePlaylist);
+
+            startActivity(intent);
 
             finish();
-        });
+        }
     }
 }

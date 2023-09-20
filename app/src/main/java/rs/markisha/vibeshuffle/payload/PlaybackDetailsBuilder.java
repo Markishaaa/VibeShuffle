@@ -1,6 +1,8 @@
 package rs.markisha.vibeshuffle.payload;
 
-public class PlaybackDetailsBuilder {
+import java.io.Serializable;
+
+public class PlaybackDetailsBuilder implements Serializable {
 
     private boolean deviceActive;
     private int timestamp;

@@ -1,6 +1,8 @@
 package rs.markisha.vibeshuffle.payload;
 
-public class TrackDetailsBuilder {
+import java.io.Serializable;
+
+public class TrackDetailsBuilder implements Serializable {
 
     private String id;
     private String name;
@@ -22,4 +24,37 @@ public class TrackDetailsBuilder {
         this.albumName = albumName;
         this.imageUrl = imageUrl;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public int getTrackNumber() {
+        return trackNumber;
+    }
+
+    public int getDurationMs() {
+        return durationMs;
+    }
+
+    public String getAlbumName() {
+        return albumName;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
 }
