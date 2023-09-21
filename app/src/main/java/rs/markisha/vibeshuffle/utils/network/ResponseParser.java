@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import rs.markisha.vibeshuffle.model.Beat;
 import rs.markisha.vibeshuffle.model.Playback;
 import rs.markisha.vibeshuffle.model.Playlist;
 import rs.markisha.vibeshuffle.model.Track;
@@ -86,6 +87,33 @@ public class ResponseParser {
             Track trackDetails = new Track(id, trackName, trackUri, trackType, trackNumber, durationMs, albumName, imageUrl);
 
             return trackDetails;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public List<Beat> parseBeatResponse(JSONObject response) {
+        List<Beat> beatsList = new ArrayList<>();
+
+        try {
+
+            if (response.has("beats")) {
+                JSONArray beats = response.getJSONArray("beats");
+
+                for (int i = 0; i < beats.length(); i++) {
+                    JSONObject beatObject = beats.getJSONObject(i);
+
+                    double start = beatObject.getDouble("start");
+                    double duration = beatObject.getDouble("duration");
+                    double confidence = beatObject.getDouble("confidence");
+
+                    Beat beat = new Beat(start, duration, confidence);
+                    beatsList.add(beat);
+                }
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();

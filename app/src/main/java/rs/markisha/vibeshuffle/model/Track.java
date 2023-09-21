@@ -14,6 +14,8 @@ public class Track implements Serializable {
     private String albumName;
     private String imageUrl;
 
+    private int progressMs;
+
     public Track(String id, String name, String uri, String type, int trackNumber, int durationMs, String albumName, String imageUrl) {
         this.id = id;
         this.name = name;
@@ -49,12 +51,15 @@ public class Track implements Serializable {
         return durationMs;
     }
 
-    public String getAlbumName() {
-        return albumName;
-    }
-
     public String getImageUrl() {
         return imageUrl;
     }
 
+    public int getProgressMs() {
+        return progressMs;
+    }
+
+    public void setProgressMs(int progressMs) {
+        this.progressMs = progressMs;
+    }
 }

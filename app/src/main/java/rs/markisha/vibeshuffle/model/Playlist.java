@@ -44,4 +44,5 @@ public class Playlist implements Serializable {
     public String getUri() {
         return uri;
     }
+
 }

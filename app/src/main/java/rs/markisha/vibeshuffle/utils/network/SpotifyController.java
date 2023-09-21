@@ -4,11 +4,13 @@ import android.content.Context;
 
 import java.io.Serializable;
 
+import rs.markisha.vibeshuffle.utils.callbacks.BeatDetailsListener;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaylistDetailsListener;
 import rs.markisha.vibeshuffle.utils.network.managers.AlbumManager;
 import rs.markisha.vibeshuffle.utils.network.managers.PlaybackManager;
 import rs.markisha.vibeshuffle.utils.network.managers.PlaylistManager;
+import rs.markisha.vibeshuffle.utils.network.managers.TrackManager;
 
 public class SpotifyController {
 
@@ -17,11 +19,13 @@ public class SpotifyController {
     private final PlaybackManager playbackManager;
     private final AlbumManager albumManager;
     private final PlaylistManager playlistManager;
+    private final TrackManager trackManager;
 
     private SpotifyController(Context context, String accessToken) {
         playbackManager = new PlaybackManager(context, accessToken);
         albumManager = new AlbumManager(context, accessToken);
         playlistManager = new PlaylistManager(context, accessToken);
+        trackManager = new TrackManager(context, accessToken);
     }
 
     public static synchronized SpotifyController getInstance(Context context, String accessToken) {
@@ -39,12 +43,24 @@ public class SpotifyController {
         playbackManager.getCurrentPlaybackState(listener);
     }
 
+    public void pausePlayback() {
+        playbackManager.pausePlayback();
+    }
+
+    public void resumePlayback(String playlistUri, int trackNumber, int positionMs) {
+        playbackManager.resumePlayback(playlistUri, trackNumber, positionMs);
+    }
+
     public void getPlaylist(String playlistId, PlaylistDetailsListener listener) {
         playlistManager.getPlaylist(playlistId, listener);
     }
 
     public void getUserPlaylists(PlaylistDetailsListener listener) {
         playlistManager.getUserPlaylists(listener);
+    }
+
+    public void getAudioAnalysis(String trackId, BeatDetailsListener listener) {
+        trackManager.getAudioAnalysis(trackId, listener);
     }
 
 }

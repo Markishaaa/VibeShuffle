@@ -9,26 +9,29 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import rs.markisha.vibeshuffle.R;
-import rs.markisha.vibeshuffle.model.Playback;
+import rs.markisha.vibeshuffle.fragments.PlayFragment;
 import rs.markisha.vibeshuffle.model.Playlist;
-import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
 import rs.markisha.vibeshuffle.utils.network.SpotifyController;
 
-public class MainActivity extends AppCompatActivity implements PlaybackDetailsListener {
+public class MainActivity extends AppCompatActivity {
 
     private SpotifyController spotifyController;
 
     private Playlist chillPlaylist;
     private Playlist aggressivePlaylist;
-    private boolean started = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_bottom, new PlayFragment())
+                    .commit();
+        }
 
         Button btnChoosePlaylists = findViewById(R.id.btnChoosePlaylists);
 
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
             SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("access_token", token);
+            editor.putBoolean("isChill", true);
             editor.apply();
 
             spotifyController = SpotifyController.getInstance(this, token);
@@ -65,6 +69,18 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
         } else {
             chillPlaylist = (Playlist) i.getSerializableExtra("chillPlaylist");
             aggressivePlaylist = (Playlist) i.getSerializableExtra("aggressivePlaylist");
+
+            PlayFragment pf = new PlayFragment();
+
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("chillPlaylist", chillPlaylist);
+            bundle.putSerializable("agroPlaylist", aggressivePlaylist);
+
+            pf.setArguments(bundle);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_bottom, pf)
+                    .commit();
 
             if (chillPlaylist != null && aggressivePlaylist != null &&
                     chillPlaylist.getName() != null && aggressivePlaylist.getName() != null) {
@@ -93,17 +109,5 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
     @Override
     protected void onStop() {
         super.onStop();
-    }
-
-    @Override
-    public void onPlaybackDetailsReceived(Playback playbackDetails) {
-        // Handle the playback details here
-        // getCurrentPlaybackState() from SpotifyApiHelper
-
-        if (!playbackDetails.isDeviceActive()) {
-            Toast.makeText(MainActivity.this, "Spotify playback is not active!", Toast.LENGTH_SHORT).show();
-        } else {
-            spotifyController.playAlbum("spotify:album:0mwmLhhRlrzg8NWohsXH6h", 0, 0);
-        }
     }
 }

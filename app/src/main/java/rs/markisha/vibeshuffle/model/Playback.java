@@ -6,15 +6,15 @@ public class Playback implements Serializable {
 
     private boolean deviceActive;
     private int timestamp;
-    private int progress_ms;
+    private int progressMs;
     private boolean isPlaying;
 
     private Track track;
 
-    public Playback(boolean deviceActive, int timestamp, int progress_ms, boolean isPlaying, Track track) {
+    public Playback(boolean deviceActive, int timestamp, int progressMs, boolean isPlaying, Track track) {
         this.deviceActive = deviceActive;
         this.timestamp = timestamp;
-        this.progress_ms = progress_ms;
+        this.progressMs = progressMs;
         this.isPlaying = isPlaying;
         this.track = track;
     }
@@ -27,8 +27,8 @@ public class Playback implements Serializable {
         return timestamp;
     }
 
-    public int getProgress_ms() {
-        return progress_ms;
+    public int getProgressMs() {
+        return progressMs;
     }
 
     public boolean isPlaying() {
