@@ -89,7 +89,8 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
 
             setBtnStateText(state);
 
-            if (playing) {
+
+            if (!playing) {
                 spotifyController.pausePlayback();
                 playRandomDropSectionOfTrack();
             }
@@ -124,9 +125,7 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
 
         currentTrack = playlistUtils.findRandomTrack(currentPlaylist);
 
-        Track randomTrack = playlistUtils.findRandomTrack(currentPlaylist);
-
-        spotifyController.getAudioAnalysis(randomTrack.getId(), this);
+        spotifyController.getAudioAnalysis(currentTrack.getId(), this);
 
         btnPlay.setText(R.string.pause_text);
     }
@@ -137,7 +136,7 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
         Random random = new Random();
 
         if (beats == null || beats.isEmpty()) {
-            int songDuration = currentTrack.getDurationMs() - (30 % currentTrack.getDurationMs());
+            int songDuration = currentTrack.getDurationMs() - (35 % currentTrack.getDurationMs());
             int randomStart = random.nextInt(songDuration);
 
             spotifyController.resumePlayback(currentPlaylist.getUri(), trackNumber, randomStart);
@@ -146,7 +145,8 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
         }
 
         List<Integer> beatDropsStart = new ArrayList<>();
-        double beatDropThreshold = 1.5; // seconds
+        double initialBeatDropThreshold = 1.5; // seconds
+        double beatDropThreshold = initialBeatDropThreshold;
 
         for (Beat b : beats) {
             double beatEndTime = b.getStart() + b.getDuration();
@@ -156,7 +156,24 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
             }
         }
 
-        int randomInd = random.nextInt(beatDropsStart.size());
+        if (beatDropsStart.isEmpty()) {
+            // If no beats meet the initial threshold, reduce the threshold
+            beatDropThreshold = initialBeatDropThreshold * 0.5;
+
+            // Re-check the beats with the new threshold
+            for (Beat b : beats) {
+                double beatEndTime = b.getStart() + b.getDuration();
+
+                if (b.getDuration() > beatDropThreshold) {
+                    beatDropsStart.add((int) (b.getStart() * 1000)); // milliseconds
+                }
+            }
+        }
+
+        // FIX THIS
+        int randomInd = beatDropsStart.isEmpty() ?
+                (beats.isEmpty() ? 0 : random.nextInt(beats.size())) :
+                random.nextInt(beatDropsStart.size());
         int randomBeatStart = beatDropsStart.get(randomInd);
 
         spotifyController.resumePlayback(currentPlaylist.getUri(), trackNumber, randomBeatStart);

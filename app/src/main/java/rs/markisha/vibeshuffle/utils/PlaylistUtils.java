@@ -8,13 +8,9 @@ import rs.markisha.vibeshuffle.model.Track;
 public class PlaylistUtils {
 
     public int findTrackNumber(Playlist p, Track t) {
-        int pos = 0;
-        for (Track ct : p.getTracks()) {
-
-            if (ct.equals(t))
-                return pos;
-
-            pos++;
+        for (int i = 0; i < p.getTracks().size(); i++) {
+            if (t.equals(p.getTracks().get(i)))
+                return i;
         }
 
         return -1;

@@ -113,6 +113,8 @@ public class ResponseParser {
                     Beat beat = new Beat(start, duration, confidence);
                     beatsList.add(beat);
                 }
+
+                return beatsList;
             }
 
         } catch (JSONException e) {
