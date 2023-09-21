@@ -1,9 +1,9 @@
 package rs.markisha.vibeshuffle.utils.callbacks;
 
-import rs.markisha.vibeshuffle.payload.PlaybackDetailsBuilder;
+import rs.markisha.vibeshuffle.model.Playback;
 
 public interface PlaybackDetailsListener {
 
-    void onPlaybackDetailsReceived(PlaybackDetailsBuilder playbackDetails);
+    void onPlaybackDetailsReceived(Playback playbackDetails);
 
 }

@@ -14,13 +14,13 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import rs.markisha.vibeshuffle.R;
-import rs.markisha.vibeshuffle.payload.TrackDetailsBuilder;
+import rs.markisha.vibeshuffle.model.Track;
 
 public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> {
 
-    private final List<TrackDetailsBuilder> tracks;
+    private final List<Track> tracks;
 
-    public TrackAdapter(List<TrackDetailsBuilder> tracks) {
+    public TrackAdapter(List<Track> tracks) {
         this.tracks = tracks;
     }
 
@@ -35,7 +35,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull TrackAdapter.ViewHolder holder, int position) {
-        TrackDetailsBuilder track = tracks.get(position);
+        Track track = tracks.get(position);
         if (track != null) {
             Picasso.get().load(track.getImageUrl()).resize(100, 100).centerCrop().into(holder.trackImage);
             holder.trackName.setText(track.getName());
@@ -45,6 +45,10 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
             String duration = minutes + ":" + seconds;
             holder.trackDuration.setText(duration);
         }
+
+        holder.itemView.setOnClickListener(v -> {
+            // play track
+        });
     }
 
     @Override

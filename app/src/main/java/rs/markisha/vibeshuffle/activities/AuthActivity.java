@@ -25,7 +25,13 @@ public class AuthActivity extends AppCompatActivity {
         AuthorizationRequest.Builder builder =
                 new AuthorizationRequest.Builder(BuildConfig.SPOTIFY_CLIENT_ID, AuthorizationResponse.Type.TOKEN, BuildConfig.SPOTIFY_REDIRECT_URI);
 
-        builder.setScopes(new String[]{"streaming", "user-read-playback-state"});
+        builder.setScopes(new String[]{
+                "streaming",
+                "user-read-playback-state",
+                "user-modify-playback-state",
+                "playlist-modify-public",
+                "playlist-modify-private"
+        });
         AuthorizationRequest request = builder.build();
 
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request);

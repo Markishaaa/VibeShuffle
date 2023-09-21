@@ -1,17 +1,17 @@
-package rs.markisha.vibeshuffle.payload;
+package rs.markisha.vibeshuffle.model;
 
 import java.io.Serializable;
 
-public class PlaybackDetailsBuilder implements Serializable {
+public class Playback implements Serializable {
 
     private boolean deviceActive;
     private int timestamp;
     private int progress_ms;
     private boolean isPlaying;
 
-    private TrackDetailsBuilder track;
+    private Track track;
 
-    public PlaybackDetailsBuilder(boolean deviceActive, int timestamp, int progress_ms, boolean isPlaying, TrackDetailsBuilder track) {
+    public Playback(boolean deviceActive, int timestamp, int progress_ms, boolean isPlaying, Track track) {
         this.deviceActive = deviceActive;
         this.timestamp = timestamp;
         this.progress_ms = progress_ms;
@@ -35,7 +35,7 @@ public class PlaybackDetailsBuilder implements Serializable {
         return isPlaying;
     }
 
-    public TrackDetailsBuilder getTrack() {
+    public Track getTrack() {
         return track;
     }
 

@@ -6,13 +6,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import rs.markisha.vibeshuffle.payload.PlaybackDetailsBuilder;
-import rs.markisha.vibeshuffle.payload.PlaylistDetailsBuilder;
-import rs.markisha.vibeshuffle.payload.TrackDetailsBuilder;
+import rs.markisha.vibeshuffle.model.Playback;
+import rs.markisha.vibeshuffle.model.Playlist;
+import rs.markisha.vibeshuffle.model.Track;
 
 public class ResponseParser {
 
-    public PlaybackDetailsBuilder parsePlaybackResponse(JSONObject response) {
+    public Playback parsePlaybackResponse(JSONObject response) {
         try {
 
             boolean deviceIsActive = response.getJSONObject("device").getBoolean("is_active");
@@ -21,9 +21,9 @@ public class ResponseParser {
             boolean isPlaying = response.getBoolean("is_playing");
 
             JSONObject track = response.getJSONObject("item");
-            TrackDetailsBuilder trackDetails = parseTrackResponse(track);
+            Track trackDetails = parseTrackResponse(track);
 
-            return new PlaybackDetailsBuilder(deviceIsActive, timestamp, progressMs, isPlaying, trackDetails);
+            return new Playback(deviceIsActive, timestamp, progressMs, isPlaying, trackDetails);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -32,7 +32,7 @@ public class ResponseParser {
         return null;
     }
 
-    public PlaylistDetailsBuilder parsePlaylistResponse(JSONObject response) {
+    public Playlist parsePlaylistResponse(JSONObject response) {
         try {
 
             String id = response.getString("id");
@@ -44,19 +44,19 @@ public class ResponseParser {
 
             String uri = response.getString("uri");
 
-            List<TrackDetailsBuilder> tracks = new ArrayList<>();
+            List<Track> tracks = new ArrayList<>();
 
             if (response.getJSONObject("tracks").has("items")) {
                 JSONArray tracksArray = response.getJSONObject("tracks").getJSONArray("items");
 
                 for (int i = 0; i < tracksArray.length(); i++) {
                     JSONObject trackObject = tracksArray.getJSONObject(i).getJSONObject("track");
-                    TrackDetailsBuilder trackDetails = parseTrackResponse(trackObject);
+                    Track trackDetails = parseTrackResponse(trackObject);
                     tracks.add(trackDetails);
                 }
             }
 
-            PlaylistDetailsBuilder playlistDetails = new PlaylistDetailsBuilder(id, name, description, imageUrl, tracks, uri);
+            Playlist playlistDetails = new Playlist(id, name, description, imageUrl, tracks, uri);
 
             return playlistDetails;
 
@@ -68,7 +68,7 @@ public class ResponseParser {
     }
 
 
-    public TrackDetailsBuilder parseTrackResponse(JSONObject response) {
+    public Track parseTrackResponse(JSONObject response) {
         try {
 
             String id = response.getString("id");
@@ -83,7 +83,7 @@ public class ResponseParser {
             JSONArray images = album.getJSONArray("images");
             String imageUrl = images.getJSONObject(0).getString("url");
 
-            TrackDetailsBuilder trackDetails = new TrackDetailsBuilder(id, trackName, trackUri, trackType, trackNumber, durationMs, albumName, imageUrl);
+            Track trackDetails = new Track(id, trackName, trackUri, trackType, trackNumber, durationMs, albumName, imageUrl);
 
             return trackDetails;
 

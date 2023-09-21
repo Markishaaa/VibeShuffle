@@ -6,23 +6,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.List;
 
 import rs.markisha.vibeshuffle.R;
 import rs.markisha.vibeshuffle.adapters.PlaylistAdapter;
-import rs.markisha.vibeshuffle.payload.PlaylistDetailsBuilder;
+import rs.markisha.vibeshuffle.model.Playlist;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaylistDetailsListener;
 import rs.markisha.vibeshuffle.utils.network.SpotifyController;
 
 public class ChoosePlaylistsActivity extends AppCompatActivity implements PlaylistDetailsListener {
 
     private Spinner sChillPlaylist, sAggressivePlaylist;
-    private PlaylistDetailsBuilder chillPlaylist;
-    private PlaylistDetailsBuilder aggressivePlaylist;
+    private Playlist chillPlaylist;
+    private Playlist aggressivePlaylist;
     private SpotifyController spotifyController;
 
     private Intent intent;
@@ -45,13 +45,11 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
     }
 
     @Override
-    public void onUserPlaylistsDetailsReceived(List<PlaylistDetailsBuilder> playlists) {
+    public void onUserPlaylistsDetailsReceived(List<Playlist> playlists) {
         if (playlists.isEmpty()) {
-            Log.d("playlistActiv", "???????");
+            Toast.makeText(this, "Playlist is empty", Toast.LENGTH_LONG).show();
             return;
         }
-
-        Log.d("playlistActiv", playlists.get(0).getName());
 
         PlaylistAdapter adapter = new PlaylistAdapter(this, playlists);
 
@@ -66,8 +64,8 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
         Button btnChoosePlaylists = findViewById(R.id.btnChoosePlaylists);
 
         btnChoosePlaylists.setOnClickListener(view -> {
-            String chillPlaylistId = ((PlaylistDetailsBuilder) sChillPlaylist.getSelectedItem()).getId();
-            String aggressivePlaylistId = ((PlaylistDetailsBuilder) sAggressivePlaylist.getSelectedItem()).getId();
+            String chillPlaylistId = ((Playlist) sChillPlaylist.getSelectedItem()).getId();
+            String aggressivePlaylistId = ((Playlist) sAggressivePlaylist.getSelectedItem()).getId();
 
             intent = new Intent(ChoosePlaylistsActivity.this, MainActivity.class);
 
@@ -77,7 +75,7 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
     }
 
     @Override
-    public void onPlaylistDetailsReceived(PlaylistDetailsBuilder playlist) {
+    public void onPlaylistDetailsReceived(Playlist playlist) {
         if (chillPlaylist == null) {
             chillPlaylist = playlist;
             intent.putExtra("chillPlaylist", chillPlaylist);

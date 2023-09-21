@@ -12,11 +12,11 @@ import androidx.annotation.NonNull;
 import java.util.List;
 
 import rs.markisha.vibeshuffle.R;
-import rs.markisha.vibeshuffle.payload.PlaylistDetailsBuilder;
+import rs.markisha.vibeshuffle.model.Playlist;
 
-public class PlaylistAdapter extends ArrayAdapter<PlaylistDetailsBuilder> {
+public class PlaylistAdapter extends ArrayAdapter<Playlist> {
 
-    public PlaylistAdapter(Context context, List<PlaylistDetailsBuilder> playlists) {
+    public PlaylistAdapter(Context context, List<Playlist> playlists) {
         super(context, 0, playlists);
     }
 
@@ -24,7 +24,7 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistDetailsBuilder> {
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         // Get the data item for this position
-        PlaylistDetailsBuilder playlist = getItem(position);
+        Playlist playlist = getItem(position);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
@@ -53,7 +53,7 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistDetailsBuilder> {
         TextView tvName = convertView.findViewById(android.R.id.text1);
 
         // Populate the data into the template view using the data object
-        PlaylistDetailsBuilder playlist = getItem(position);
+        Playlist playlist = getItem(position);
         if (playlist != null) {
             tvName.setText(playlist.getName());
         }

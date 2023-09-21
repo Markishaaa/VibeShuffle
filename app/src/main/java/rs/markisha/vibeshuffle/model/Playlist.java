@@ -1,18 +1,18 @@
-package rs.markisha.vibeshuffle.payload;
+package rs.markisha.vibeshuffle.model;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class PlaylistDetailsBuilder implements Serializable {
+public class Playlist implements Serializable {
 
     private String id;
     private String name;
     private String description;
     private String imageUrl;
-    private List<TrackDetailsBuilder> tracks;
+    private List<Track> tracks;
     private String uri;
 
-    public PlaylistDetailsBuilder(String id, String name, String description, String imageUrl, List<TrackDetailsBuilder> tracks, String uri) {
+    public Playlist(String id, String name, String description, String imageUrl, List<Track> tracks, String uri) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -37,7 +37,7 @@ public class PlaylistDetailsBuilder implements Serializable {
         return imageUrl;
     }
 
-    public List<TrackDetailsBuilder> getTracks() {
+    public List<Track> getTracks() {
         return tracks;
     }
 

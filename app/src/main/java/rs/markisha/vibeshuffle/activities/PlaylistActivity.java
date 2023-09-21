@@ -13,11 +13,11 @@ import com.squareup.picasso.Picasso;
 
 import rs.markisha.vibeshuffle.R;
 import rs.markisha.vibeshuffle.adapters.TrackAdapter;
-import rs.markisha.vibeshuffle.payload.PlaylistDetailsBuilder;
+import rs.markisha.vibeshuffle.model.Playlist;
 
 public class PlaylistActivity extends AppCompatActivity {
 
-    private PlaylistDetailsBuilder playlist;
+    private Playlist playlist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         if (i.hasExtra("playlist")) {
-            playlist = (PlaylistDetailsBuilder) i.getSerializableExtra("playlist");
+            playlist = (Playlist) i.getSerializableExtra("playlist");
 
             ImageView imgView = findViewById(R.id.imageView);
             TextView tvName = findViewById(R.id.tvName);

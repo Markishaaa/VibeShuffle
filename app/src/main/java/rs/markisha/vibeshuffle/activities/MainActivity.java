@@ -6,15 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import rs.markisha.vibeshuffle.R;
-import rs.markisha.vibeshuffle.payload.PlaybackDetailsBuilder;
-import rs.markisha.vibeshuffle.payload.PlaylistDetailsBuilder;
+import rs.markisha.vibeshuffle.model.Playback;
+import rs.markisha.vibeshuffle.model.Playlist;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
 import rs.markisha.vibeshuffle.utils.network.SpotifyController;
 
@@ -22,8 +21,8 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
 
     private SpotifyController spotifyController;
 
-    private PlaylistDetailsBuilder chillPlaylist;
-    private PlaylistDetailsBuilder aggressivePlaylist;
+    private Playlist chillPlaylist;
+    private Playlist aggressivePlaylist;
     private boolean started = false;
 
     @Override
@@ -60,14 +59,12 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
 
     private void checkPlaylist(Intent i) {
         if (!i.hasExtra("chillPlaylist")) {
-            Log.d("hasplaylist", "no");
             Intent ni = new Intent(this, ChoosePlaylistsActivity.class);
             startActivity(ni);
             finish();
         } else {
-            Log.d("hasplaylist", "yes");
-            chillPlaylist = (PlaylistDetailsBuilder) i.getSerializableExtra("chillPlaylist");
-            aggressivePlaylist = (PlaylistDetailsBuilder) i.getSerializableExtra("aggressivePlaylist");
+            chillPlaylist = (Playlist) i.getSerializableExtra("chillPlaylist");
+            aggressivePlaylist = (Playlist) i.getSerializableExtra("aggressivePlaylist");
 
             if (chillPlaylist != null && aggressivePlaylist != null &&
                     chillPlaylist.getName() != null && aggressivePlaylist.getName() != null) {
@@ -82,13 +79,10 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
 
     public void onTextClick(View view) {
         Intent i = new Intent(this, PlaylistActivity.class);
-        Log.d("hasplaylist", "started");
 
         if (view.getId() == R.id.chillPlaylist2) {
-            Log.d("hasplaylist", "????");
             i.putExtra("playlist", chillPlaylist);
         } else if (view.getId() == R.id.aggressivePlaylist2) {
-            Log.d("hasplaylist", "??!@!@!?");
             i.putExtra("playlist", aggressivePlaylist);
         }
 
@@ -102,14 +96,11 @@ public class MainActivity extends AppCompatActivity implements PlaybackDetailsLi
     }
 
     @Override
-    public void onPlaybackDetailsReceived(PlaybackDetailsBuilder playbackDetails) {
+    public void onPlaybackDetailsReceived(Playback playbackDetails) {
         // Handle the playback details here
         // getCurrentPlaybackState() from SpotifyApiHelper
 
-        Log.d("playback", "this is playback");
-
         if (!playbackDetails.isDeviceActive()) {
-            Log.d("playback", "not active");
             Toast.makeText(MainActivity.this, "Spotify playback is not active!", Toast.LENGTH_SHORT).show();
         } else {
             spotifyController.playAlbum("spotify:album:0mwmLhhRlrzg8NWohsXH6h", 0, 0);
