@@ -23,6 +23,7 @@ import rs.markisha.vibeshuffle.model.Playback;
 import rs.markisha.vibeshuffle.model.Playlist;
 import rs.markisha.vibeshuffle.model.Track;
 import rs.markisha.vibeshuffle.receivers.VolumeButtonReceiver;
+import rs.markisha.vibeshuffle.utils.BeatUtils;
 import rs.markisha.vibeshuffle.utils.PlaylistUtils;
 import rs.markisha.vibeshuffle.utils.callbacks.BeatDetailsListener;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
@@ -36,11 +37,14 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
     private SharedPreferences sharedPreferences;
     private VolumeButtonReceiver volumeButtonReceiver;
     private PlaylistUtils playlistUtils;
+    private BeatUtils beatUtils;
 
     private Button btnState;
     private Button btnPlay;
     private Button btnVolume;
 
+    private Track currentTrack;
+    private Playlist currentPlaylist;
     private boolean playing;
 
     private Playlist chillPlaylist;
@@ -56,6 +60,8 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
 
         volumeButtonReceiver = new VolumeButtonReceiver(requireContext());
         playlistUtils = new PlaylistUtils();
+        beatUtils = new BeatUtils();
+        playing = true;
     }
 
     @Nullable
@@ -75,6 +81,7 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
 
         btnPlay.setOnClickListener(v -> {
             spotifyController.getCurrentPlaybackState(this);
+            // goes to onPlaybackDetailsReceived
         });
 
         btnVolume.setOnClickListener(v -> {
@@ -111,9 +118,6 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
         }
     }
 
-    private Track currentTrack;
-    private Playlist currentPlaylist;
-
     private void playRandomDropSectionOfTrack() {
         boolean isChill = sharedPreferences.getBoolean("isChill", true);
 
@@ -133,49 +137,35 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
     @Override
     public void onBeatsDetailsReceived(List<Beat> beats) {
         int trackNumber = playlistUtils.findTrackNumber(currentPlaylist, currentTrack);
+        Log.d("playliststracks", trackNumber + "");
         Random random = new Random();
 
         if (beats == null || beats.isEmpty()) {
+            Log.d("beats", "beats empty");
             int songDuration = currentTrack.getDurationMs() - (35 % currentTrack.getDurationMs());
             int randomStart = random.nextInt(songDuration);
 
+            Log.d("playliststracks", currentPlaylist.getUri());
             spotifyController.resumePlayback(currentPlaylist.getUri(), trackNumber, randomStart);
 
             return;
         }
 
-        List<Integer> beatDropsStart = new ArrayList<>();
-        double initialBeatDropThreshold = 1.5; // seconds
-        double beatDropThreshold = initialBeatDropThreshold;
+        List<Integer> beatDropsStart = beatUtils.findBeatDropsStartTimesMs(beats);
+        Log.d("beats", beatDropsStart.size() + " " + beats.size());
 
-        for (Beat b : beats) {
-            double beatEndTime = b.getStart() + b.getDuration();
-
-            if (b.getDuration() > beatDropThreshold) {
-                beatDropsStart.add((int) (b.getStart() * 1000)); // milliseconds
-            }
-        }
+        int randInd = 0;
+        int randomBeatStart = 0;
 
         if (beatDropsStart.isEmpty()) {
-            // If no beats meet the initial threshold, reduce the threshold
-            beatDropThreshold = initialBeatDropThreshold * 0.5;
-
-            // Re-check the beats with the new threshold
-            for (Beat b : beats) {
-                double beatEndTime = b.getStart() + b.getDuration();
-
-                if (b.getDuration() > beatDropThreshold) {
-                    beatDropsStart.add((int) (b.getStart() * 1000)); // milliseconds
-                }
-            }
+            randInd = random.nextInt(beats.size());
+            randomBeatStart = (int) beats.get(randInd).getStart() * 1000;
+        } else {
+            randInd = random.nextInt(beatDropsStart.size());
+            randomBeatStart = beatDropsStart.get(randInd);
         }
 
-        // FIX THIS
-        int randomInd = beatDropsStart.isEmpty() ?
-                (beats.isEmpty() ? 0 : random.nextInt(beats.size())) :
-                random.nextInt(beatDropsStart.size());
-        int randomBeatStart = beatDropsStart.get(randomInd);
-
+        Log.d("playliststracks", currentPlaylist.getUri());
         spotifyController.resumePlayback(currentPlaylist.getUri(), trackNumber, randomBeatStart);
     }
 
@@ -218,14 +208,13 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
     @Override
     public void onVolumeButtonPressed() {
         if (btnState != null) {
-            Log.d("wonder", "wonder");
             boolean isChill = sharedPreferences.getBoolean("isChill", true);
             setBtnStateText(isChill);
         }
     }
 
-    private void setBtnStateText(boolean state) {
-        if (state)
+    private void setBtnStateText(boolean isChill) {
+        if (isChill)
             btnState.setText(R.string.chill_text);
         else
             btnState.setText(R.string.agro_text);

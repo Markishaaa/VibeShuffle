@@ -3,6 +3,7 @@ package rs.markisha.vibeshuffle.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -63,6 +64,7 @@ public class AuthActivity extends AppCompatActivity {
                 case ERROR:
                     // Handle error response
                     Log.e("SpotifyAuth", response.getError());
+                    Toast.makeText(this, "Spotify auth unavailable", Toast.LENGTH_LONG).show();
                     break;
 
                 // Most likely auth flow was cancelled

@@ -128,13 +128,14 @@ public class PlaybackManager extends SpotifyApiHelper {
         String playUrl = BASE_URL + "me/player/play";
 
         JSONObject requestBody = new JSONObject();
-        JSONObject offset = new JSONObject();
+
 
         try {
-
+            JSONObject offset = new JSONObject();
             offset.put("position", trackNumber);
 
             requestBody.put("context_uri", playlistUri);
+            requestBody.put("offset", offset);
             requestBody.put("position_ms", positionMs);
 
         } catch (JSONException e) {
