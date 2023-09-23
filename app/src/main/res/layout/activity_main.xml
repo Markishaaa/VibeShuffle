@@ -35,13 +35,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="onTextClick"
+        android:textColor="@color/teal_200"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chillPlaylist"
-        android:textColor="@color/teal_200"
-        android:clickable="true"
-        android:onClick="onTextClick"
-        android:focusable="true"/>
+        app:layout_constraintTop_toBottomOf="@+id/chillPlaylist" />
 
     <TextView
         android:id="@+id/aggressivePlaylist"
@@ -61,22 +61,21 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="44dp"
         android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="onTextClick"
+        android:textColor="@color/teal_200"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/aggressivePlaylist"
-        android:textColor="@color/teal_200"
-        android:clickable="true"
-        android:onClick="onTextClick"
-        android:focusable="true" />
+        app:layout_constraintTop_toBottomOf="@+id/aggressivePlaylist" />
 
     <FrameLayout
         android:id="@+id/frame_bottom"
-        android:layout_width="409dp"
-        android:layout_height="200dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
     </FrameLayout>
 

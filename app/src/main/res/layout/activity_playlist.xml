@@ -6,17 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".activities.PlaylistActivity">
 
-    <FrameLayout
-        android:id="@+id/frame_bottom"
-        android:layout_width="409dp"
-        android:layout_height="200dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="parent">
-
-    </FrameLayout>
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
@@ -49,12 +38,24 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSongs"
-        android:layout_width="409dp"
-        android:layout_height="589dp"
-        android:layout_marginStart="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/frame_bottom"
+        app:layout_constraintEnd_toEndOf="@+id/frame_bottom"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintStart_toStartOf="@+id/frame_bottom"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <FrameLayout
+        android:id="@+id/frame_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintStart_toStartOf="parent">
+
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

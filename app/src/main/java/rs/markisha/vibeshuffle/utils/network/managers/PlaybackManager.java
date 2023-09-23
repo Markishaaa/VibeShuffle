@@ -43,6 +43,7 @@ public class PlaybackManager extends SpotifyApiHelper {
                     listener.onPlaybackDetailsReceived(playbackDetails);
                 },
                 error -> {
+                    listener.onPlaybackError();
                 }
         ) {
             @Override

@@ -7,5 +7,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="back_color">#141414</color>
-    <color name="fab_color">#20D761</color>
+    <color name="player">#996a5a</color>
+    <color name="player_playing">#bd5b40</color>
+    <color name="player_aggressive">#de3c3c</color>
+    <color name="player_playing_aggressive">#fc0a0a</color>
+    <color name="player_clicked">#109c7c70</color>
 </resources>

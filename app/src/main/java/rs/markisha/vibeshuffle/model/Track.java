@@ -1,5 +1,7 @@
 package rs.markisha.vibeshuffle.model;
 
+import com.google.gson.Gson;
+
 import java.io.Serializable;
 
 public class Track implements Serializable {
@@ -11,19 +13,19 @@ public class Track implements Serializable {
     private int trackNumber;
     private int durationMs;
 
-    private String albumName;
+    private String artistName;
     private String imageUrl;
 
     private int progressMs;
 
-    public Track(String id, String name, String uri, String type, int trackNumber, int durationMs, String albumName, String imageUrl) {
+    public Track(String id, String name, String uri, String type, int trackNumber, int durationMs, String artistName, String imageUrl) {
         this.id = id;
         this.name = name;
         this.uri = uri;
         this.type = type;
         this.trackNumber = trackNumber;
         this.durationMs = durationMs;
-        this.albumName = albumName;
+        this.artistName = artistName;
         this.imageUrl = imageUrl;
     }
 
@@ -59,7 +61,9 @@ public class Track implements Serializable {
         return progressMs;
     }
 
+    public String getArtistName() { return artistName; }
     public void setProgressMs(int progressMs) {
         this.progressMs = progressMs;
     }
+
 }

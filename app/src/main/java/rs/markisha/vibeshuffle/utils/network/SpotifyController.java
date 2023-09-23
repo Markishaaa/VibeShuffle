@@ -51,8 +51,8 @@ public class SpotifyController {
         playbackManager.resumePlayback(playlistUri, trackNumber, positionMs);
     }
 
-    public void getPlaylist(String playlistId, PlaylistDetailsListener listener) {
-        playlistManager.getPlaylist(playlistId, listener);
+    public void getPlaylist(String playlistId, PlaylistDetailsListener listener, String type) {
+        playlistManager.getPlaylist(playlistId, listener, type);
     }
 
     public void getUserPlaylists(PlaylistDetailsListener listener) {

@@ -33,6 +33,21 @@ public class ResponseParser {
         return null;
     }
 
+    public Playlist parseUserPlaylistResponse(JSONObject response) {
+        try {
+
+            String id = response.getString("id");
+            String name = response.getString("name");
+
+            return new Playlist(id, name);
+
+        }  catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public Playlist parsePlaylistResponse(JSONObject response) {
         try {
 
@@ -57,9 +72,7 @@ public class ResponseParser {
                 }
             }
 
-            Playlist playlistDetails = new Playlist(id, name, description, imageUrl, tracks, uri);
-
-            return playlistDetails;
+            return new Playlist(id, name, description, imageUrl, tracks, uri);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -67,7 +80,6 @@ public class ResponseParser {
 
         return null;
     }
-
 
     public Track parseTrackResponse(JSONObject response) {
         try {
@@ -79,14 +91,15 @@ public class ResponseParser {
             int trackNumber = response.getInt("track_number");
             int durationMs = response.getInt("duration_ms");
 
+            JSONArray artists = response.getJSONArray("artists");
+            JSONObject artist = artists.getJSONObject(0);
+            String artistName = artist.getString("name");
+
             JSONObject album = response.getJSONObject("album");
-            String albumName = album.getString("name");
             JSONArray images = album.getJSONArray("images");
             String imageUrl = images.getJSONObject(0).getString("url");
 
-            Track trackDetails = new Track(id, trackName, trackUri, trackType, trackNumber, durationMs, albumName, imageUrl);
-
-            return trackDetails;
+            return new Track(id, trackName, trackUri, trackType, trackNumber, durationMs, artistName, imageUrl);
 
         } catch (JSONException e) {
             e.printStackTrace();

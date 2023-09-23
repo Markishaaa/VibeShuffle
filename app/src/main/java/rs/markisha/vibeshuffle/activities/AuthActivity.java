@@ -31,7 +31,8 @@ public class AuthActivity extends AppCompatActivity {
                 "user-read-playback-state",
                 "user-modify-playback-state",
                 "playlist-modify-public",
-                "playlist-modify-private"
+                "playlist-modify-private",
+                "playlist-read-private"
         });
         AuthorizationRequest request = builder.build();
 

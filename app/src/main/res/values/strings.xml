@@ -6,4 +6,7 @@
     <string name="agro_text">agro</string>
     <string name="play_text">▶</string>
     <string name="pause_text">⏸</string>
+    <string name="volume_text">🔊</string>
+    <string name="image_of_playing_track">image of playing track</string>
+    <string name="now_playing_text">now playing</string>
 </resources>

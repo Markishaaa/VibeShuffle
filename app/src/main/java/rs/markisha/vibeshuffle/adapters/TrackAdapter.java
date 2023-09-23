@@ -42,7 +42,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
 
             int minutes = (track.getDurationMs() / 1000) / 60;
             int seconds = (track.getDurationMs() / 1000) % 60;
-            String duration = minutes + ":" + seconds;
+            String duration = String.format("%d:%02d", minutes, seconds);
             holder.trackDuration.setText(duration);
         }
 

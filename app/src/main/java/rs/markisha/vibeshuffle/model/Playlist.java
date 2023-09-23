@@ -1,5 +1,7 @@
 package rs.markisha.vibeshuffle.model;
 
+import com.google.gson.Gson;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -11,6 +13,11 @@ public class Playlist implements Serializable {
     private String imageUrl;
     private List<Track> tracks;
     private String uri;
+
+    public Playlist(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public Playlist(String id, String name, String description, String imageUrl, List<Track> tracks, String uri) {
         this.id = id;

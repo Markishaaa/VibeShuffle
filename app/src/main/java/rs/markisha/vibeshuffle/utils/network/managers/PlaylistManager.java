@@ -32,17 +32,17 @@ public class PlaylistManager extends SpotifyApiHelper {
         this.responseParser = new ResponseParser();
     }
 
-    public void getPlaylist(String playlistId, PlaylistDetailsListener listener) {
-        String playbackStateUrl = BASE_URL + "playlists/" + playlistId;
+    public void getPlaylist(String playlistId, PlaylistDetailsListener listener, String type) {
+        String url = BASE_URL + "playlists/" + playlistId;
 
         JsonObjectRequest playbackStateRequest = new JsonObjectRequest(
                 Request.Method.GET,
-                playbackStateUrl,
+                url,
                 null,
                 response -> {
                     Playlist playlistDetails = responseParser.parsePlaylistResponse(response);
 
-                    listener.onPlaylistDetailsReceived(playlistDetails);
+                    listener.onPlaylistDetailsReceived(playlistDetails, type);
                 },
                 error -> {
                 }
@@ -59,13 +59,13 @@ public class PlaylistManager extends SpotifyApiHelper {
     }
 
     public void getUserPlaylists(PlaylistDetailsListener listener) {
-        String playbackStateUrl = BASE_URL + "me/playlists/";
+        String url = BASE_URL + "me/playlists/";
 
         List<Playlist> playlists = new ArrayList<>();
 
         JsonObjectRequest playbackStateRequest = new JsonObjectRequest(
                 Request.Method.GET,
-                playbackStateUrl,
+                url,
                 null,
                 response -> {
                     if (response.has("items")) {
@@ -76,7 +76,7 @@ public class PlaylistManager extends SpotifyApiHelper {
 
                             for (int i = 0; i < itemsArray.length(); i++) {
                                 JSONObject playlistObject = itemsArray.getJSONObject(i);
-                                Playlist playlistDetails = responseParser.parsePlaylistResponse(playlistObject);
+                                Playlist playlistDetails = responseParser.parseUserPlaylistResponse(playlistObject);
                                 playlists.add(playlistDetails);
                             }
 

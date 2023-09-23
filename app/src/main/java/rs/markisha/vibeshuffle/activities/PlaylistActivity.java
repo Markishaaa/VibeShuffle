@@ -13,6 +13,7 @@ import com.squareup.picasso.Picasso;
 
 import rs.markisha.vibeshuffle.R;
 import rs.markisha.vibeshuffle.adapters.TrackAdapter;
+import rs.markisha.vibeshuffle.fragments.PlayFragment;
 import rs.markisha.vibeshuffle.model.Playlist;
 
 public class PlaylistActivity extends AppCompatActivity {
@@ -23,6 +24,12 @@ public class PlaylistActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.frame_bottom, new PlayFragment())
+                    .commit();
+        }
 
         Intent i = getIntent();
         if (i.hasExtra("playlist")) {

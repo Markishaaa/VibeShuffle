@@ -58,6 +58,10 @@ dependencies {
     implementation project(':spotify-auth')
     implementation "com.google.code.gson:gson:2.10.1"
 
+    // image processing library
     implementation 'com.android.volley:volley:1.2.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    // sqlite db
+    implementation 'androidx.sqlite:sqlite:2.3.1'
 }

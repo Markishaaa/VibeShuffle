@@ -9,11 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -28,6 +32,7 @@ import rs.markisha.vibeshuffle.utils.PlaylistUtils;
 import rs.markisha.vibeshuffle.utils.callbacks.BeatDetailsListener;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
 import rs.markisha.vibeshuffle.utils.callbacks.VolumeButtonListener;
+import rs.markisha.vibeshuffle.utils.database.DBHelper;
 import rs.markisha.vibeshuffle.utils.network.SpotifyController;
 
 
@@ -36,8 +41,11 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
     private SpotifyController spotifyController;
     private SharedPreferences sharedPreferences;
     private VolumeButtonReceiver volumeButtonReceiver;
+
     private PlaylistUtils playlistUtils;
     private BeatUtils beatUtils;
+
+    private DBHelper dbHelper;
 
     private Button btnState;
     private Button btnPlay;
@@ -50,18 +58,44 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
     private Playlist chillPlaylist;
     private Playlist agroPlaylist;
 
+    private TrackPlayingFragment trackPlayingFragment;
+    private FragmentTransaction transaction;
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Log.d("saveInstance", "saving");
+
+        outState.putSerializable("chillPlaylist", chillPlaylist);
+        outState.putSerializable("agroPlaylist", agroPlaylist);
+        outState.putSerializable("currentPlaylist", currentPlaylist);
+        outState.putSerializable("currentTrack", currentTrack);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sharedPreferences = getActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        if (savedInstanceState != null) {
+            Log.d("saveInstance", "retrieving");
+            chillPlaylist = (Playlist) savedInstanceState.get("chillPlaylist");
+            agroPlaylist = (Playlist) savedInstanceState.get("agroPlaylist");
+            currentTrack = (Track) savedInstanceState.get("currentTrack");
+            currentPlaylist = (Playlist) savedInstanceState.get("currentPlaylist");
+        }
+
+        dbHelper = new DBHelper(requireContext());
+
+        playing = true;
+
+        sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String token = sharedPreferences.getString("access_token", "");
         spotifyController = SpotifyController.getInstance(getContext(), token);
 
         volumeButtonReceiver = new VolumeButtonReceiver(requireContext());
         playlistUtils = new PlaylistUtils();
         beatUtils = new BeatUtils();
-        playing = true;
     }
 
     @Nullable
@@ -69,11 +103,8 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_play, container, false);
 
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            chillPlaylist = (Playlist) bundle.getSerializable("chillPlaylist");
-            agroPlaylist = (Playlist) bundle.getSerializable("agroPlaylist");
-        }
+        chillPlaylist = dbHelper.getPlaylistOfType("chill");
+        agroPlaylist = dbHelper.getPlaylistOfType("agro");
 
         btnState = view.findViewById(R.id.button);
         btnPlay = view.findViewById(R.id.btnPlay);
@@ -85,7 +116,7 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
         });
 
         btnVolume.setOnClickListener(v -> {
-            Log.d("please", "please");
+            spotifyController.resumePlayback("spotify:playlist:3A9mgJfKfHf1ogOzX9V54m", 0, 0);
         });
 
         btnState.setOnClickListener(v -> {
@@ -95,7 +126,6 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
             editor.apply();
 
             setBtnStateText(state);
-
 
             if (!playing) {
                 spotifyController.pausePlayback();
@@ -113,9 +143,20 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
             // Handle pause logic
             spotifyController.pausePlayback();
             btnPlay.setText(R.string.play_text);
+
+            if (trackPlayingFragment != null) {
+                transaction = getChildFragmentManager().beginTransaction();
+                transaction.remove(trackPlayingFragment);
+                transaction.commit();
+            }
         } else {
             playRandomDropSectionOfTrack();
         }
+    }
+
+    @Override
+    public void onPlaybackError() {
+        Toast.makeText(requireContext(), "Spotify playback not active", Toast.LENGTH_LONG).show();
     }
 
     private void playRandomDropSectionOfTrack() {
@@ -129,6 +170,11 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
 
         currentTrack = playlistUtils.findRandomTrack(currentPlaylist);
 
+        trackPlayingFragment = TrackPlayingFragment.newInstance(currentTrack);
+        transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.track_playing_container, trackPlayingFragment);
+        transaction.commit();
+
         spotifyController.getAudioAnalysis(currentTrack.getId(), this);
 
         btnPlay.setText(R.string.pause_text);
@@ -137,22 +183,18 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
     @Override
     public void onBeatsDetailsReceived(List<Beat> beats) {
         int trackNumber = playlistUtils.findTrackNumber(currentPlaylist, currentTrack);
-        Log.d("playliststracks", trackNumber + "");
         Random random = new Random();
 
         if (beats == null || beats.isEmpty()) {
-            Log.d("beats", "beats empty");
             int songDuration = currentTrack.getDurationMs() - (35 % currentTrack.getDurationMs());
             int randomStart = random.nextInt(songDuration);
 
-            Log.d("playliststracks", currentPlaylist.getUri());
             spotifyController.resumePlayback(currentPlaylist.getUri(), trackNumber, randomStart);
 
             return;
         }
 
         List<Integer> beatDropsStart = beatUtils.findBeatDropsStartTimesMs(beats);
-        Log.d("beats", beatDropsStart.size() + " " + beats.size());
 
         int randInd = 0;
         int randomBeatStart = 0;
@@ -165,7 +207,6 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
             randomBeatStart = beatDropsStart.get(randInd);
         }
 
-        Log.d("playliststracks", currentPlaylist.getUri());
         spotifyController.resumePlayback(currentPlaylist.getUri(), trackNumber, randomBeatStart);
     }
 
