@@ -63,4 +63,8 @@ public class SpotifyController {
         trackManager.getAudioAnalysis(trackId, listener);
     }
 
+    public void setVolume(int volume) {
+        playbackManager.setVolume(volume);
+    }
+
 }

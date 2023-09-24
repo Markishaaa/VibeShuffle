@@ -12,24 +12,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rs.markisha.vibeshuffle.model.Playlist;
-import rs.markisha.vibeshuffle.model.Track;
-import rs.markisha.vibeshuffle.utils.network.SpotifyController;
 
 public class DBHelper extends SQLiteOpenHelper {
 
     private final Gson gson;
 
     private static final String DATABASE_NAME = "vibeshuffle.db";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
 
     private static final String TABLE_PLAYLIST = "playlist";
     private static final String TABLE_TRACK = "track";
 
     private static final String COLUMN_TYPE = "type";
+    private static final String COLUMN_VOLUME = "volume";
     private static final String COLUMN_JSON_DATA = "json_data";
 
     private final String CREATE_TABLE_PLAYLIST = "CREATE TABLE " + TABLE_PLAYLIST + "("
             + COLUMN_TYPE + " TEXT,"
+            + COLUMN_VOLUME + " INTEGER,"
             + COLUMN_JSON_DATA + " TEXT"
             + ")";
 
@@ -65,6 +65,7 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_TYPE, type);
+        values.put(COLUMN_VOLUME, 0);
 
         // Convert Playlist object to JSON
         String playlistJson = playlistToJson(playlist);
@@ -98,6 +99,53 @@ public class DBHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
+
+    public void updateVolumeOfPlaylistType(int newVolume, String type) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_VOLUME, newVolume);
+
+        try {
+            db.beginTransaction();
+
+            // Check the number of rows in the table
+            Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_PLAYLIST, null);
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    String whereClause = COLUMN_TYPE + " = ?";
+                    String[] whereArgs = {type};
+
+                    db.update(TABLE_PLAYLIST, values, whereClause, whereArgs);
+                }
+                cursor.close();
+            }
+
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+    }
+
+    public int getVolumeOfPlaylistType(String type) {
+        int volume = 0;
+
+        String selectQuery = "SELECT * FROM " + TABLE_PLAYLIST + " WHERE " + COLUMN_TYPE + " = ?";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{type});
+
+        if (cursor.moveToFirst()) {
+            int i = cursor.getColumnIndex(COLUMN_VOLUME);
+            volume = i != -1 ? cursor.getInt(i) : 0;
+        }
+
+        cursor.close();
+
+        return volume;
+    }
+
 
     public Playlist getPlaylistOfType(String type) {
         Playlist playlist = null;

@@ -12,4 +12,5 @@
     <color name="player_aggressive">#de3c3c</color>
     <color name="player_playing_aggressive">#fc0a0a</color>
     <color name="player_clicked">#109c7c70</color>
+    <color name="settings_background">#5f7062</color>
 </resources>

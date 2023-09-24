@@ -10,4 +10,8 @@
     <string name="image_of_playing_track">image of playing track</string>
     <string name="now_playing_text">now playing</string>
     <string name="auth_error">Auth error. Please try again</string>
+    <string name="change_volume_settings">Volume Settings</string>
+    <string name="chill">chill</string>
+    <string name="agro">agro</string>
+    <string name="save">Save</string>
 </resources>

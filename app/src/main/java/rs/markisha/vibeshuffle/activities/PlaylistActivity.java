@@ -31,6 +31,14 @@ public class PlaylistActivity extends AppCompatActivity {
                     .commit();
         }
 
+        TextView tv = findViewById(R.id.tvBack);
+
+        tv.setOnClickListener(l -> {
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
+            finish();
+        });
+
         Intent i = getIntent();
         if (i.hasExtra("playlist")) {
             playlist = (Playlist) i.getSerializableExtra("playlist");

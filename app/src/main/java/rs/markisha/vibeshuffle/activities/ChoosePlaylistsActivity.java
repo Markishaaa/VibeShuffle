@@ -95,13 +95,14 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
 
     @Override
     public void onPlaylistDetailsError(String error) {
+        Log.d("playlistError", "in here");
         ConstraintLayout layout = findViewById(R.id.clErrorPlaylist);
         layout.setVisibility(View.VISIBLE);
 
         TextView tvError = findViewById(R.id.tvErrorPlaylist);
-        if (error.contains("401")) {
+//        if (error.contains("401")) {
             tvError.setText(R.string.auth_error);
-        }
+//        }
 
         Button btnError = findViewById(R.id.btnErrorPlaylist);
 

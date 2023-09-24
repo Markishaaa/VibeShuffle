@@ -75,12 +75,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkPlaylist() {
-        List<Playlist> ps = dbHelper.getAllPlaylists();
-
-        for (Playlist p : ps) {
-
-        }
-
         chillPlaylist = dbHelper.getPlaylistOfType("chill");
         aggressivePlaylist = dbHelper.getPlaylistOfType("agro");
 

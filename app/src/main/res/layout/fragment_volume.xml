@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clVolume"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/settings_background"
+    tools:context=".fragments.VolumeFragment">
+
+    <TextView
+        android:id="@+id/tvVolumeSettings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/change_volume_settings"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <SeekBar
+        android:id="@+id/sbChill"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/seek_bar"
+        android:thumb="@drawable/seek_thumb"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sbAgro" />
+
+    <SeekBar
+        android:id="@+id/sbAgro"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/seek_bar"
+        android:thumb="@drawable/seek_thumb"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvVolumeSettings" />
+
+    <Button
+        android:id="@+id/btnVolumeSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:text="@string/save"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvChill"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/chill"
+        android:textColor="#EEEEEE"
+        app:layout_constraintEnd_toStartOf="@+id/sbAgro"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/sbAgro" />
+
+    <TextView
+        android:id="@+id/tvAgro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/agro"
+        android:textColor="#EEEEEE"
+        app:layout_constraintEnd_toStartOf="@+id/sbChill"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/sbChill" />
+</androidx.constraintlayout.widget.ConstraintLayout>

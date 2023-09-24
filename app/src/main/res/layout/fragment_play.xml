@@ -2,8 +2,26 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/play_border_outer"
+    android:background="#00000000"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/volume_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        app:layout_constraintBottom_toTopOf="@+id/barrier"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="volume_container, track_playing_container" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/track_playing_container"
@@ -12,7 +30,7 @@
         app:layout_constraintBottom_toTopOf="@+id/player_border"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/barrier" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/player_border"
@@ -20,38 +38,44 @@
         android:layout_height="wrap_content"
         android:background="@color/player"
         android:gravity="bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/track_playing_container">
 
-        <Button
-            android:id="@+id/button"
+        <ToggleButton
+            android:id="@+id/btnState"
             style="@style/CustomButtonStyle"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:background="@drawable/custom_button"
-            android:text="@string/chill_text"
+            android:textOff="@string/agro_text"
+            android:textOn="@string/chill_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btnPlay"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <ToggleButton
             android:id="@+id/btnPlay"
             style="@style/CustomButtonStyle"
             android:background="@drawable/custom_button"
-            android:text="@string/play_text"
+            android:textOn="@string/pause_text"
+            android:textOff="@string/play_text"
             android:textSize="40sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <ToggleButton
             android:id="@+id/btnVolume"
             style="@style/CustomButtonStyle"
             android:layout_marginStart="8dp"
             android:background="@drawable/custom_button"
-            android:text="@string/volume_text"
+            android:textOn="@string/volume_text"
+            android:textOff="@string/volume_text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btnPlay"
