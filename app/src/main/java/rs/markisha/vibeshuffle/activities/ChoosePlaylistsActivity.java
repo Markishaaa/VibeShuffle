@@ -1,22 +1,25 @@
 package rs.markisha.vibeshuffle.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
 
 import rs.markisha.vibeshuffle.R;
+import rs.markisha.vibeshuffle.VibeShuffle;
 import rs.markisha.vibeshuffle.adapters.PlaylistAdapter;
 import rs.markisha.vibeshuffle.model.Playlist;
-import rs.markisha.vibeshuffle.model.Track;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaylistDetailsListener;
 import rs.markisha.vibeshuffle.utils.database.DBHelper;
 import rs.markisha.vibeshuffle.utils.network.SpotifyController;
@@ -32,7 +35,7 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_playlists);
-        dbHelper = new DBHelper(this);
+        dbHelper = VibeShuffle.getDBHelper();
     }
 
     @Override
@@ -69,14 +72,8 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
             String chillPlaylistId = ((Playlist) sChillPlaylist.getSelectedItem()).getId();
             String aggressivePlaylistId = ((Playlist) sAggressivePlaylist.getSelectedItem()).getId();
 
-            Intent intent = new Intent(ChoosePlaylistsActivity.this, MainActivity.class);
-
             spotifyController.getPlaylist(chillPlaylistId, this, "chill");
             spotifyController.getPlaylist(aggressivePlaylistId, this, "agro");
-
-            startActivity(intent);
-
-            finish();
         });
     }
 
@@ -86,6 +83,33 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
             dbHelper.insertOrUpdatePlaylist(playlist, "chill");
         } else {
             dbHelper.insertOrUpdatePlaylist(playlist, "agro");
+
+            List<Playlist> play = dbHelper.getAllPlaylists();
+
+            dbHelper.close();
+            Intent intent = new Intent(ChoosePlaylistsActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
+
+    @Override
+    public void onPlaylistDetailsError(String error) {
+        ConstraintLayout layout = findViewById(R.id.clErrorPlaylist);
+        layout.setVisibility(View.VISIBLE);
+
+        TextView tvError = findViewById(R.id.tvErrorPlaylist);
+        if (error.contains("401")) {
+            tvError.setText(R.string.auth_error);
+        }
+
+        Button btnError = findViewById(R.id.btnErrorPlaylist);
+
+        btnError.setOnClickListener(view -> {
+            Intent i = new Intent(this, AuthActivity.class);
+            startActivity(i);
+            finish();
+        });
+    }
+
 }

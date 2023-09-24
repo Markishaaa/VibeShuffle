@@ -8,5 +8,6 @@ public interface PlaylistDetailsListener {
 
     void onUserPlaylistsDetailsReceived(List<Playlist> playlists);
     void onPlaylistDetailsReceived(Playlist playlist, String type);
+    void onPlaylistDetailsError(String error);
 
 }

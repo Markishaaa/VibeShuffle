@@ -9,4 +9,5 @@
     <string name="volume_text">🔊</string>
     <string name="image_of_playing_track">image of playing track</string>
     <string name="now_playing_text">now playing</string>
+    <string name="auth_error">Auth error. Please try again</string>
 </resources>

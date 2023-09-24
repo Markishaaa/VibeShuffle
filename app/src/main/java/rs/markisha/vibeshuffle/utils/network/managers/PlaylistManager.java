@@ -45,6 +45,7 @@ public class PlaylistManager extends SpotifyApiHelper {
                     listener.onPlaylistDetailsReceived(playlistDetails, type);
                 },
                 error -> {
+                    listener.onPlaylistDetailsError(error.getMessage());
                 }
         ) {
             @Override

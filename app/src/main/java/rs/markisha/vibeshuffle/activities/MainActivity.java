@@ -11,7 +11,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.List;
+
 import rs.markisha.vibeshuffle.R;
+import rs.markisha.vibeshuffle.VibeShuffle;
 import rs.markisha.vibeshuffle.fragments.PlayFragment;
 import rs.markisha.vibeshuffle.model.Playlist;
 import rs.markisha.vibeshuffle.utils.database.DBHelper;
@@ -24,11 +27,19 @@ public class MainActivity extends AppCompatActivity {
     private DBHelper dbHelper;
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.d("dbHelper", "onDestroy");
+        dbHelper.close();
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dbHelper = new DBHelper(this);
+        Log.d("dbHelper", "onCreate");
+        dbHelper = VibeShuffle.getDBHelper();
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -49,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        Log.d("dbHelper", "onStart");
         Intent i = getIntent();
         if (i.hasExtra("TOKEN")) {
             String token = i.getStringExtra("TOKEN");
@@ -63,13 +75,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkPlaylist() {
+        List<Playlist> ps = dbHelper.getAllPlaylists();
+
+        for (Playlist p : ps) {
+
+        }
+
         chillPlaylist = dbHelper.getPlaylistOfType("chill");
         aggressivePlaylist = dbHelper.getPlaylistOfType("agro");
 
-        Log.d("mydb", chillPlaylist.getName());
-
         if (chillPlaylist == null || aggressivePlaylist == null) {
-            return;
+            Intent ni = new Intent(this, ChoosePlaylistsActivity.class);
+            startActivity(ni);
+            finish();
         }
 
         PlayFragment pf = new PlayFragment();
@@ -83,38 +101,6 @@ public class MainActivity extends AppCompatActivity {
         TextView tvAggressivePlaylist = findViewById(R.id.aggressivePlaylist2);
         tvAggressivePlaylist.setText(aggressivePlaylist.getName());
     }
-
-//    private void checkPlaylist(Intent i) {
-//        if (!i.hasExtra("chillPlaylist")) {
-//            Intent ni = new Intent(this, ChoosePlaylistsActivity.class);
-//            startActivity(ni);
-//            finish();
-//        } else {
-//            chillPlaylist = (Playlist) i.getSerializableExtra("chillPlaylist");
-//            aggressivePlaylist = (Playlist) i.getSerializableExtra("aggressivePlaylist");
-//
-//            PlayFragment pf = new PlayFragment();
-//
-//            Bundle bundle = new Bundle();
-//            bundle.putSerializable("chillPlaylist", chillPlaylist);
-//            bundle.putSerializable("agroPlaylist", aggressivePlaylist);
-//
-//            pf.setArguments(bundle);
-//
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.frame_bottom, pf)
-//                    .commit();
-//
-//            if (chillPlaylist != null && aggressivePlaylist != null &&
-//                    chillPlaylist.getName() != null && aggressivePlaylist.getName() != null) {
-//                TextView tvChillPlaylist = findViewById(R.id.chillPlaylist2);
-//                tvChillPlaylist.setText(chillPlaylist.getName());
-//
-//                TextView tvAggressivePlaylist = findViewById(R.id.aggressivePlaylist2);
-//                tvAggressivePlaylist.setText(aggressivePlaylist.getName());
-//            }
-//        }
-//    }
 
     public void onTextClick(View view) {
         Intent i = new Intent(this, PlaylistActivity.class);

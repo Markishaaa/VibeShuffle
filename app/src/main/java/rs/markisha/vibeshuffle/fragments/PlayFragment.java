@@ -13,10 +13,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import java.util.List;
 import java.util.Random;
@@ -34,6 +33,7 @@ import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
 import rs.markisha.vibeshuffle.utils.callbacks.VolumeButtonListener;
 import rs.markisha.vibeshuffle.utils.database.DBHelper;
 import rs.markisha.vibeshuffle.utils.network.SpotifyController;
+import rs.markisha.vibeshuffle.viewmodels.PlayViewModel;
 
 
 public class PlayFragment extends Fragment implements PlaybackDetailsListener, VolumeButtonListener, BeatDetailsListener {
@@ -53,13 +53,16 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
 
     private Track currentTrack;
     private Playlist currentPlaylist;
+
     private boolean playing;
+    private boolean state = true;
 
     private Playlist chillPlaylist;
     private Playlist agroPlaylist;
 
     private TrackPlayingFragment trackPlayingFragment;
     private FragmentTransaction transaction;
+    private PlayViewModel model;
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
@@ -74,6 +77,16 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Log.d("uichange", "this is ondestroy");
+        model.setUiState(currentTrack, currentPlaylist, playing, state);
+
+        dbHelper.close();
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -85,9 +98,17 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
             currentPlaylist = (Playlist) savedInstanceState.get("currentPlaylist");
         }
 
-        dbHelper = new DBHelper(requireContext());
+        model = new ViewModelProvider(this).get(PlayViewModel.class);
+        model.getUiState().observe(this, uiState -> {
+            currentTrack = uiState.getCurrentTrack();
+            currentPlaylist = uiState.getCurrentPlaylist();
+            playing = uiState.isPlaying();
+            state = uiState.getState();
 
-        playing = true;
+            Log.d("uichange", playing + " " + state);
+        });
+
+        dbHelper = new DBHelper(requireContext());
 
         sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         String token = sharedPreferences.getString("access_token", "");
@@ -110,6 +131,8 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
         btnPlay = view.findViewById(R.id.btnPlay);
         btnVolume = view.findViewById(R.id.btnVolume);
 
+        checkForUpdates();
+
         btnPlay.setOnClickListener(v -> {
             spotifyController.getCurrentPlaybackState(this);
             // goes to onPlaybackDetailsReceived
@@ -120,7 +143,7 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
         });
 
         btnState.setOnClickListener(v -> {
-            boolean state = !(sharedPreferences.getBoolean("isChill", true));
+            state = !(sharedPreferences.getBoolean("isChill", true));
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("isChill", state);
             editor.apply();
@@ -135,6 +158,15 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
 
         return view;
     }
+
+    private void checkForUpdates() {
+        if (playing) {
+            btnPlay.setText(R.string.play_text);
+        } if (!state) {
+            btnState.setText(R.string.agro_text);
+        }
+    }
+
 
     public void onPlaybackDetailsReceived(Playback playbackDetails) {
         playing = playbackDetails.isPlaying();
@@ -160,9 +192,9 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, V
     }
 
     private void playRandomDropSectionOfTrack() {
-        boolean isChill = sharedPreferences.getBoolean("isChill", true);
+        state = sharedPreferences.getBoolean("isChill", true);
 
-        if (isChill) {
+        if (state) {
             currentPlaylist = chillPlaylist;
         } else {
             currentPlaylist = agroPlaylist;
