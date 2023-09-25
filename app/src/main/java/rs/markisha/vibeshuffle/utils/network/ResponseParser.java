@@ -58,6 +58,9 @@ public class ResponseParser {
             JSONArray images = response.getJSONArray("images");
             String imageUrl = images.getJSONObject(0).getString("url");
 
+            JSONObject owner = response.getJSONObject("owner");
+            String userId = owner.getString("id");
+
             String uri = response.getString("uri");
 
             List<Track> tracks = new ArrayList<>();
@@ -72,7 +75,7 @@ public class ResponseParser {
                 }
             }
 
-            return new Playlist(id, name, description, imageUrl, tracks, uri);
+            return new Playlist(id, name, description, imageUrl, tracks, uri, userId);
 
         } catch (JSONException e) {
             e.printStackTrace();

@@ -61,6 +61,14 @@ public class DBHelper extends SQLiteOpenHelper {
         return gson.fromJson(json, Playlist.class);
     }
 
+    public void removeAllPlaylist() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(TABLE_PLAYLIST, null, null);
+
+        db.close();
+    }
+
     public void insertOrUpdatePlaylist(Playlist playlist, String type) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();

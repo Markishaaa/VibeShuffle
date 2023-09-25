@@ -13,19 +13,21 @@ public class Playlist implements Serializable {
     private String imageUrl;
     private List<Track> tracks;
     private String uri;
+    private String authorId;
 
     public Playlist(String id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public Playlist(String id, String name, String description, String imageUrl, List<Track> tracks, String uri) {
+    public Playlist(String id, String name, String description, String imageUrl, List<Track> tracks, String uri, String authorId) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.imageUrl = imageUrl;
         this.tracks = tracks;
         this.uri = uri;
+        this.authorId = authorId;
     }
 
     public String getId() {
@@ -52,4 +54,11 @@ public class Playlist implements Serializable {
         return uri;
     }
 
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
+    }
+
+    public String getAuthorId() {
+        return authorId;
+    }
 }

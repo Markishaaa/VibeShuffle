@@ -20,6 +20,7 @@ import rs.markisha.vibeshuffle.R;
 import rs.markisha.vibeshuffle.VibeShuffle;
 import rs.markisha.vibeshuffle.adapters.PlaylistAdapter;
 import rs.markisha.vibeshuffle.model.Playlist;
+import rs.markisha.vibeshuffle.utils.PlaylistUtils;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaylistDetailsListener;
 import rs.markisha.vibeshuffle.utils.database.DBHelper;
 import rs.markisha.vibeshuffle.utils.network.SpotifyController;
@@ -31,11 +32,15 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
 
     private DBHelper dbHelper;
 
+    private String userId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_playlists);
         dbHelper = VibeShuffle.getDBHelper();
+
+        dbHelper.removeAllPlaylist();
     }
 
     @Override
@@ -46,7 +51,7 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
         String token = sharedPreferences.getString("access_token", "");
         spotifyController = SpotifyController.getInstance(this, token);
 
-        spotifyController.getUserPlaylists(this);
+        spotifyController.getUserId(this);
     }
 
     @Override
@@ -78,6 +83,13 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
     }
 
     @Override
+    public void onUserIdReceived(String userId) {
+        this.userId = userId;
+
+        spotifyController.getUserPlaylists(this, userId);
+    }
+
+    @Override
     public void onPlaylistDetailsReceived(Playlist playlist, String type) {
         if (type.equals("chill")) {
             dbHelper.insertOrUpdatePlaylist(playlist, "chill");
@@ -100,9 +112,7 @@ public class ChoosePlaylistsActivity extends AppCompatActivity implements Playli
         layout.setVisibility(View.VISIBLE);
 
         TextView tvError = findViewById(R.id.tvErrorPlaylist);
-//        if (error.contains("401")) {
-            tvError.setText(R.string.auth_error);
-//        }
+        tvError.setText(R.string.auth_error);
 
         Button btnError = findViewById(R.id.btnErrorPlaylist);
 

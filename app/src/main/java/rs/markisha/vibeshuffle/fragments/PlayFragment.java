@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -60,17 +61,39 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
 
     private Intent serviceIntent;
 
+    private final BroadcastReceiver volumeButtonReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (context != null) {
+                if (intent.getAction() != null) {
+                    if (intent.getAction().equals("volume_down")) {
+//                        Log.d("PlayFragment", "volume button down pressed");
+//                        spotifyController.setVolume(dbHelper.getVolumeOfPlaylistType("chill"));
+//                        currentPlaylist = chillPlaylist;
+
+                    } else if (intent.getAction().equals("volume_up")) {
+//                        Log.d("PlayFragment", "volume button down pressed");
+//                        spotifyController.setVolume(dbHelper.getVolumeOfPlaylistType("agro"));
+//                        currentPlaylist = agroPlaylist;
+                    }
+                }
+
+                playRandomDropSectionOfTrackFromPlaylist(currentPlaylist);
+            }
+        }
+    };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("volume_down");
-        filter.addAction("volume_up");
-        requireActivity().registerReceiver(volumeButtonReceiver, filter);
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction("volume_down");
+//        filter.addAction("volume_up");
+//        requireActivity().registerReceiver(volumeButtonReceiver, filter);
 
         model = new ViewModelProvider(requireActivity()).get(PlayViewModel.class);
-        Log.d("playfragment", model.getCurrentTrack() + " ");
+        Log.d("PlayFragment", model.getCurrentTrack() + " ");
 
         dbHelper = VibeShuffle.getDBHelper();
 
@@ -100,7 +123,7 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
 
         changeViewColor(view);
 
-        if (btnState.isChecked()) {
+        if (!btnState.isChecked()) {
             currentPlaylist = agroPlaylist;
         } else {
             currentPlaylist = chillPlaylist;
@@ -118,7 +141,7 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
 
             changeViewColor(view);
 
-            if (isChecked) {
+            if (!isChecked) {
                 currentPlaylist = agroPlaylist;
             } else {
                 currentPlaylist = chillPlaylist;
@@ -143,7 +166,9 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
             } else {
                 btnVolume.setTextColor(ResourcesCompat.getColor(getResources(), R.color.white, null));
 
-                transaction.remove(volumeFragment);
+                if (volumeFragment != null) {
+                    transaction.remove(volumeFragment);
+                }
             }
 
             transaction.commit();
@@ -177,6 +202,8 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
 
     @Override
     public void onPlaybackDetailsReceived(Playback playbackDetails) {
+        btnPlay.setChecked(!playbackDetails.isPlaying());
+
         if (playbackDetails.isPlaying()) {
             spotifyController.pausePlayback();
 
@@ -195,7 +222,24 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
         }
     }
 
+    private void changeVolume() {
+        AudioManager mgr = (AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE);
+        int maxVolume = mgr.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int volume;
+        if (currentPlaylist == chillPlaylist) {
+            volume = dbHelper.getVolumeOfPlaylistType("chill") % maxVolume;
+            mgr.setStreamVolume(AudioManager.STREAM_MUSIC, volume, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+            spotifyController.setVolume(dbHelper.getVolumeOfPlaylistType("chill"));
+        } else {
+            volume = dbHelper.getVolumeOfPlaylistType("agro") % maxVolume;
+            mgr.setStreamVolume(AudioManager.STREAM_MUSIC, volume, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+            spotifyController.setVolume(dbHelper.getVolumeOfPlaylistType("agro"));
+        }
+    }
+
     private void playRandomDropSectionOfTrackFromPlaylist(Playlist p) {
+        changeVolume();
+
         if (serviceIntent == null) {
             serviceIntent = new Intent(requireContext(), VolumeChangeService.class);
             requireActivity().startService(serviceIntent);
@@ -250,42 +294,6 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
     public void onPlaybackError() {
         Toast.makeText(requireContext(), "Spotify playback not active", Toast.LENGTH_LONG).show();
         btnPlay.setChecked(false);
-    }
-
-    private BroadcastReceiver volumeButtonReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (fragmentContext != null) {
-                if (intent.getAction() != null) {
-                    if (intent.getAction().equals("volume_down")) {
-                        spotifyController.setVolume(dbHelper.getVolumeOfPlaylistType("chill"));
-                        currentPlaylist = chillPlaylist;
-
-                    } else if (intent.getAction().equals("volume_up")) {
-                        spotifyController.setVolume(dbHelper.getVolumeOfPlaylistType("agro"));
-                        currentPlaylist = agroPlaylist;
-                    }
-                }
-
-                playRandomDropSectionOfTrackFromPlaylist(currentPlaylist);
-            }
-        }
-    };
-
-    private Context fragmentContext;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        // Store the context when the fragment is attached
-        fragmentContext = context;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        // Release the stored context when the fragment is detached
-        fragmentContext = null;
     }
 
 }

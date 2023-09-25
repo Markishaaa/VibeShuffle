@@ -1,7 +1,5 @@
 package rs.markisha.vibeshuffle.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,14 +9,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.List;
+import androidx.appcompat.app.AppCompatActivity;
 
 import rs.markisha.vibeshuffle.R;
 import rs.markisha.vibeshuffle.VibeShuffle;
 import rs.markisha.vibeshuffle.fragments.PlayFragment;
 import rs.markisha.vibeshuffle.model.Playlist;
 import rs.markisha.vibeshuffle.utils.database.DBHelper;
-import rs.markisha.vibeshuffle.utils.network.SpotifyController;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("dbHelper", "onDestroy");
         dbHelper.close();
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,14 +84,18 @@ public class MainActivity extends AppCompatActivity {
 
         PlayFragment pf = new PlayFragment();
         getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.frame_bottom, pf)
-                    .commit();
+                .replace(R.id.frame_bottom, pf)
+                .commit();
 
-        TextView tvChillPlaylist = findViewById(R.id.chillPlaylist2);
-        tvChillPlaylist.setText(chillPlaylist.getName());
+        if (chillPlaylist.getName() != null) {
+            TextView tvChillPlaylist = findViewById(R.id.chillPlaylist2);
+            tvChillPlaylist.setText(chillPlaylist.getName());
+        }
 
-        TextView tvAggressivePlaylist = findViewById(R.id.aggressivePlaylist2);
-        tvAggressivePlaylist.setText(aggressivePlaylist.getName());
+        if (aggressivePlaylist.getName() != null) {
+            TextView tvAggressivePlaylist = findViewById(R.id.aggressivePlaylist2);
+            tvAggressivePlaylist.setText(aggressivePlaylist.getName());
+        }
     }
 
     public void onTextClick(View view) {

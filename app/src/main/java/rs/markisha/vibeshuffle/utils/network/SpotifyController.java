@@ -55,8 +55,8 @@ public class SpotifyController {
         playlistManager.getPlaylist(playlistId, listener, type);
     }
 
-    public void getUserPlaylists(PlaylistDetailsListener listener) {
-        playlistManager.getUserPlaylists(listener);
+    public void getUserPlaylists(PlaylistDetailsListener listener, String id) {
+        playlistManager.getUserPlaylists(listener, id);
     }
 
     public void getAudioAnalysis(String trackId, BeatDetailsListener listener) {
@@ -65,6 +65,10 @@ public class SpotifyController {
 
     public void setVolume(int volume) {
         playbackManager.setVolume(volume);
+    }
+
+    public void getUserId(PlaylistDetailsListener l) {
+        playlistManager.getUserId(l);
     }
 
 }

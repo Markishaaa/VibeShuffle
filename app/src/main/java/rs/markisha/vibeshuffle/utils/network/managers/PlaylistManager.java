@@ -32,6 +32,33 @@ public class PlaylistManager extends SpotifyApiHelper {
         this.responseParser = new ResponseParser();
     }
 
+    public void getUserId(PlaylistDetailsListener listener) {
+        String url = BASE_URL + "me";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, response -> {
+                    try {
+                        String userId = response.getString("id");
+
+                        listener.onUserIdReceived(userId);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }, error -> {
+
+                }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + getAccessToken());
+                return headers;
+            }
+        };
+
+        requestQueue.add(jsonObjectRequest);
+    }
+
     public void getPlaylist(String playlistId, PlaylistDetailsListener listener, String type) {
         String url = BASE_URL + "playlists/" + playlistId;
 
@@ -59,8 +86,8 @@ public class PlaylistManager extends SpotifyApiHelper {
         requestQueue.add(playbackStateRequest);
     }
 
-    public void getUserPlaylists(PlaylistDetailsListener listener) {
-        String url = BASE_URL + "me/playlists/";
+    public void getUserPlaylists(PlaylistDetailsListener listener, String id) {
+        String url = BASE_URL + "users/" + id +"/playlists/";
 
         List<Playlist> playlists = new ArrayList<>();
 
@@ -78,6 +105,7 @@ public class PlaylistManager extends SpotifyApiHelper {
                             for (int i = 0; i < itemsArray.length(); i++) {
                                 JSONObject playlistObject = itemsArray.getJSONObject(i);
                                 Playlist playlistDetails = responseParser.parseUserPlaylistResponse(playlistObject);
+                                playlistDetails.setAuthorId(id);
                                 playlists.add(playlistDetails);
                             }
 
