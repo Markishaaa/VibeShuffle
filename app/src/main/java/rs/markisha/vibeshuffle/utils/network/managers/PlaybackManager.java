@@ -29,7 +29,7 @@ public class PlaybackManager extends SpotifyApiHelper {
         this.requestQueue = Volley.newRequestQueue(context);
     }
 
-    public void getCurrentPlaybackState(PlaybackDetailsListener listener) {
+    public void getCurrentPlaybackState(PlaybackDetailsListener listener, boolean isChecked) {
         String playbackStateUrl = BASE_URL + "me/player";
 
         JsonObjectRequest playbackStateRequest = new JsonObjectRequest(
@@ -40,7 +40,7 @@ public class PlaybackManager extends SpotifyApiHelper {
                     ResponseParser rp = new ResponseParser();
                     Playback playbackDetails = rp.parsePlaybackResponse(response);
 
-                    listener.onPlaybackDetailsReceived(playbackDetails);
+                    listener.onPlaybackDetailsReceived(playbackDetails, isChecked);
                 },
                 error -> {
                     listener.onPlaybackError();

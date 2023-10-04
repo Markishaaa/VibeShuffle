@@ -15,9 +15,11 @@ import rs.markisha.vibeshuffle.R;
 import rs.markisha.vibeshuffle.VibeShuffle;
 import rs.markisha.vibeshuffle.fragments.PlayFragment;
 import rs.markisha.vibeshuffle.model.Playlist;
+import rs.markisha.vibeshuffle.model.Track;
+import rs.markisha.vibeshuffle.utils.callbacks.PlayerListener;
 import rs.markisha.vibeshuffle.utils.database.DBHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PlayerListener {
 
     private Playlist chillPlaylist;
     private Playlist aggressivePlaylist;
@@ -117,4 +119,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
     }
+
+    @Override
+    public void getCurrentPlayingTrack(Track currentTrack) {
+
+    }
+
 }

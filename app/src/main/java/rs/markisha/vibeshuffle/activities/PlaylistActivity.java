@@ -15,6 +15,7 @@ import rs.markisha.vibeshuffle.R;
 import rs.markisha.vibeshuffle.adapters.TrackAdapter;
 import rs.markisha.vibeshuffle.fragments.PlayFragment;
 import rs.markisha.vibeshuffle.model.Playlist;
+import rs.markisha.vibeshuffle.model.Track;
 
 public class PlaylistActivity extends AppCompatActivity {
 
@@ -57,11 +58,21 @@ public class PlaylistActivity extends AppCompatActivity {
         }
     }
 
+    private TrackAdapter adapter;
+
     private void showTracks() {
         RecyclerView recyclerView = findViewById(R.id.rvSongs);
-        TrackAdapter adapter = new TrackAdapter(playlist.getTracks());
+        adapter = new TrackAdapter(playlist.getTracks());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    public void setHighlightedTrack(Track track) {
+        int trackPos = adapter.findPositionOfTrack(track);
+
+        if (trackPos != -1) {
+            adapter.notifyItemChanged(trackPos);
+        }
     }
 
 }

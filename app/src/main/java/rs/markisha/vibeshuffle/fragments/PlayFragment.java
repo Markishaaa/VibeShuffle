@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +23,8 @@ import java.util.Random;
 
 import rs.markisha.vibeshuffle.R;
 import rs.markisha.vibeshuffle.VibeShuffle;
+import rs.markisha.vibeshuffle.activities.MainActivity;
+import rs.markisha.vibeshuffle.activities.PlaylistActivity;
 import rs.markisha.vibeshuffle.model.Beat;
 import rs.markisha.vibeshuffle.model.Playback;
 import rs.markisha.vibeshuffle.model.Playlist;
@@ -114,11 +115,18 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
         btnPlay.setOnCheckedChangeListener((v, isChecked) -> {
             saveSwitchState("play", isChecked);
 
-            spotifyController.getCurrentPlaybackState(this);
+            spotifyController.getCurrentPlaybackState(this, isChecked);
             // goes to onPlaybackDetailsReceived
         });
 
         return view;
+    }
+
+    private void saveSwitchState(String key, boolean value) {
+        SharedPreferences preferences = requireContext().getSharedPreferences("SwitchState", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
     }
 
     private void onVolumeChange(boolean isChecked) {
@@ -151,78 +159,28 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
         }
     }
 
-    private void getCurrentPlaylist(boolean btnState) {
-        if (btnState) {
-            currentPlaylist = agroPlaylist;
-        } else {
-            currentPlaylist = chillPlaylist;
-        }
-    }
-
-    private void loadTrackPlayingFragment() {
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        trackPlayingFragment = TrackPlayingFragment.newInstance(model.getCurrentTrack());
-        transaction.replace(R.id.track_playing_container, trackPlayingFragment, "trackPlayingFragment");
-        transaction.commit();
-    }
-
-    private void changeViewColor(View view) {
-        ConstraintLayout border = view.findViewById(R.id.player_border);
-        if (btnState.isChecked()) {
-            border.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.player_aggressive, null));
-        } else {
-            border.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.player, null));
-        }
-    }
-
-    private void saveSwitchState(String key, boolean value) {
-        SharedPreferences preferences = requireContext().getSharedPreferences("SwitchState", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(key, value);
-        editor.apply();
-    }
-
     @Override
-    public void onPlaybackDetailsReceived(Playback playbackDetails) {
-        btnPlay.setChecked(!playbackDetails.isPlaying());
-        saveSwitchState("play", !playbackDetails.isPlaying());
-
-        if (playbackDetails.isPlaying()) {
-            spotifyController.pausePlayback();
-
-            if (serviceIntent != null) {
-                requireActivity().stopService(serviceIntent);
-            }
-
-            // remove track playing fragment
-            if (trackPlayingFragment != null) {
-                FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-                transaction.remove(trackPlayingFragment);
-                transaction.commit();
+    public void onPlaybackDetailsReceived(Playback playbackDetails, boolean isChecked) {
+        if (isChecked) {
+            if (!playbackDetails.isPlaying()) {
+                playRandomDropSectionOfTrackFromPlaylist(currentPlaylist);
             }
         } else {
-            playRandomDropSectionOfTrackFromPlaylist(currentPlaylist);
+            if (playbackDetails.isPlaying()) {
+                spotifyController.pausePlayback();
+
+                if (serviceIntent != null) {
+                    requireActivity().stopService(serviceIntent);
+                }
+
+                // remove track playing fragment
+                if (trackPlayingFragment != null) {
+                    FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+                    transaction.remove(trackPlayingFragment);
+                    transaction.commit();
+                }
+            }
         }
-    }
-
-    private void changeVolume() {
-        AudioManager mgr = (AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE);
-        int spotifyVolume;
-        int maxSystemVolume = mgr.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int systemVolume;
-
-        if (currentPlaylist == chillPlaylist) {
-            spotifyVolume = dbHelper.getVolumeOfPlaylistType("chill");
-        } else {
-            spotifyVolume = dbHelper.getVolumeOfPlaylistType("agro");
-        }
-
-        systemVolume = (int) ((float) spotifyVolume / 100 * maxSystemVolume);
-
-        Log.d("playfragment", spotifyVolume + " " + maxSystemVolume + " " + systemVolume);
-
-        spotifyController.setVolume(spotifyVolume);
-        mgr.setStreamVolume(AudioManager.STREAM_MUSIC, systemVolume, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
     }
 
     private void playRandomDropSectionOfTrackFromPlaylist(Playlist p) {
@@ -233,7 +191,12 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
 
         model.setCurrentTrack(playlistUtils.findRandomTrack(p));
 
-        //replace track playing fragment
+        // send track to PlaylistActivity
+        if (getActivity() instanceof PlaylistActivity) {
+            ((PlaylistActivity) getActivity()).setHighlightedTrack(model.getCurrentTrack());
+        }
+
+        // replace track playing fragment
         if (model.getCurrentTrack() != null) {
             loadTrackPlayingFragment();
         }
@@ -281,6 +244,52 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
 
         btnPlay.setChecked(false);
         saveSwitchState("play", false);
+    }
+
+    private void changeViewColor(View view) {
+        ConstraintLayout border = view.findViewById(R.id.player_border);
+        int playerColor;
+
+        if (btnState.isChecked()) {
+            playerColor = ResourcesCompat.getColor(getResources(), R.color.player_aggressive, null);
+        } else {
+            playerColor = ResourcesCompat.getColor(getResources(), R.color.player, null);
+        }
+
+        border.setBackgroundColor(playerColor);
+    }
+
+    private void changeVolume() {
+        AudioManager mgr = (AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE);
+        int spotifyVolume;
+        int maxSystemVolume = mgr.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int systemVolume;
+
+        if (currentPlaylist == chillPlaylist) {
+            spotifyVolume = dbHelper.getVolumeOfPlaylistType("chill");
+        } else {
+            spotifyVolume = dbHelper.getVolumeOfPlaylistType("agro");
+        }
+
+        systemVolume = (int) ((float) spotifyVolume / 100 * maxSystemVolume);
+
+        spotifyController.setVolume(spotifyVolume);
+        mgr.setStreamVolume(AudioManager.STREAM_MUSIC, systemVolume, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+    }
+
+    private void getCurrentPlaylist(boolean btnState) {
+        if (btnState) {
+            currentPlaylist = agroPlaylist;
+        } else {
+            currentPlaylist = chillPlaylist;
+        }
+    }
+
+    private void loadTrackPlayingFragment() {
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        trackPlayingFragment = TrackPlayingFragment.newInstance(model.getCurrentTrack());
+        transaction.replace(R.id.track_playing_container, trackPlayingFragment, "trackPlayingFragment");
+        transaction.commit();
     }
 
 }

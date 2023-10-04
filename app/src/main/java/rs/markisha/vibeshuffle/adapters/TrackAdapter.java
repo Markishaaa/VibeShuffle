@@ -20,6 +20,8 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
 
     private final List<Track> tracks;
 
+    private int highlightedTrackPosition = -1;
+
     public TrackAdapter(List<Track> tracks) {
         this.tracks = tracks;
     }
@@ -27,8 +29,10 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     @NonNull
     @Override
     public TrackAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        int layoutResId = (viewType == 1) ? R.layout.track_item_highlighted : R.layout.track_item;
+
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.track_item, parent, false);
+                .inflate(layoutResId, parent, false);
 
         return new ViewHolder(itemView);
     }
@@ -36,13 +40,14 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull TrackAdapter.ViewHolder holder, int position) {
         Track track = tracks.get(position);
+
         if (track != null) {
             Picasso.get().load(track.getImageUrl()).resize(100, 100).centerCrop().into(holder.trackImage);
             holder.trackName.setText(track.getName());
 
             int minutes = (track.getDurationMs() / 1000) / 60;
             int seconds = (track.getDurationMs() / 1000) % 60;
-            String duration = String.format("%d:%02d", minutes, seconds);
+            String duration = String.format("%02d:%02d", minutes, seconds);
             holder.trackDuration.setText(duration);
         }
 
@@ -56,7 +61,25 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         return tracks.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public int findPositionOfTrack(Track track) {
+        for (int i = 0; i < tracks.size(); i++) {
+            if (tracks.get(i).equals(track)) {
+                highlightedTrackPosition = i;
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position == highlightedTrackPosition) {
+            return 1; // Use a different view type for highlighted items
+        }
+        return 0; // Use the default view type for other items
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView trackImage;
         public TextView trackName;
         public TextView trackDuration;
@@ -67,6 +90,5 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
             trackName = itemView.findViewById(R.id.tvTrackName);
             trackDuration = itemView.findViewById(R.id.tvTrackDuration);
         }
-
     }
 }

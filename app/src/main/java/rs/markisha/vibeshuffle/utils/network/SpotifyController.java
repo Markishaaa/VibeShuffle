@@ -39,8 +39,8 @@ public class SpotifyController {
         albumManager.playAlbum(albumUri, position, positionMs);
     }
 
-    public void getCurrentPlaybackState(PlaybackDetailsListener listener) {
-        playbackManager.getCurrentPlaybackState(listener);
+    public void getCurrentPlaybackState(PlaybackDetailsListener listener, boolean isChecked) {
+        playbackManager.getCurrentPlaybackState(listener, isChecked);
     }
 
     public void pausePlayback() {

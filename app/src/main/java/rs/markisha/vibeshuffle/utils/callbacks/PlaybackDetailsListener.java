@@ -4,7 +4,7 @@ import rs.markisha.vibeshuffle.model.Playback;
 
 public interface PlaybackDetailsListener {
 
-    void onPlaybackDetailsReceived(Playback playbackDetails);
+    void onPlaybackDetailsReceived(Playback playbackDetails, boolean isChecked);
     void onPlaybackError();
 
 }
