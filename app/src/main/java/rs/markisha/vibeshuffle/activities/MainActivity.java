@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
             Intent ni = new Intent(this, ChoosePlaylistsActivity.class);
             startActivity(ni);
             finish();
+
+            return;
         }
 
         PlayFragment pf = new PlayFragment();
