@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 import rs.markisha.vibeshuffle.utils.callbacks.BeatDetailsListener;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
+import rs.markisha.vibeshuffle.utils.callbacks.PlaybackStateListener;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaylistDetailsListener;
 import rs.markisha.vibeshuffle.utils.network.managers.AlbumManager;
 import rs.markisha.vibeshuffle.utils.network.managers.PlaybackManager;
@@ -41,6 +42,10 @@ public class SpotifyController {
 
     public void getCurrentPlaybackState(PlaybackDetailsListener listener, boolean isChecked) {
         playbackManager.getCurrentPlaybackState(listener, isChecked);
+    }
+
+    public void checkCurrentPlaybackState(PlaybackStateListener listener) {
+        playbackManager.checkCurrentPlaybackState(listener);
     }
 
     public void pausePlayback() {

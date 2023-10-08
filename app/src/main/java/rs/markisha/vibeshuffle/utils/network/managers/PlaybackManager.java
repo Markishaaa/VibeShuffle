@@ -17,6 +17,7 @@ import java.util.Map;
 
 import rs.markisha.vibeshuffle.model.Playback;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
+import rs.markisha.vibeshuffle.utils.callbacks.PlaybackStateListener;
 import rs.markisha.vibeshuffle.utils.network.ResponseParser;
 import rs.markisha.vibeshuffle.utils.network.SpotifyApiHelper;
 
@@ -41,6 +42,34 @@ public class PlaybackManager extends SpotifyApiHelper {
                     Playback playbackDetails = rp.parsePlaybackResponse(response);
 
                     listener.onPlaybackDetailsReceived(playbackDetails, isChecked);
+                },
+                error -> {
+                    listener.onPlaybackError();
+                }
+        ) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Authorization", "Bearer " + getAccessToken());
+                return headers;
+            }
+        };
+
+        requestQueue.add(playbackStateRequest);
+    }
+
+    public void checkCurrentPlaybackState(PlaybackStateListener listener) {
+        String playbackStateUrl = BASE_URL + "me/player";
+
+        JsonObjectRequest playbackStateRequest = new JsonObjectRequest(
+                Request.Method.GET,
+                playbackStateUrl,
+                null,
+                response -> {
+                    ResponseParser rp = new ResponseParser();
+                    Playback playbackDetails = rp.parsePlaybackResponse(response);
+
+                    listener.onPlaybackStateReceived(playbackDetails);
                 },
                 error -> {
                     listener.onPlaybackError();

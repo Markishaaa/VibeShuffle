@@ -23,7 +23,6 @@ import java.util.Random;
 
 import rs.markisha.vibeshuffle.R;
 import rs.markisha.vibeshuffle.VibeShuffle;
-import rs.markisha.vibeshuffle.activities.MainActivity;
 import rs.markisha.vibeshuffle.activities.PlaylistActivity;
 import rs.markisha.vibeshuffle.model.Beat;
 import rs.markisha.vibeshuffle.model.Playback;
@@ -33,11 +32,12 @@ import rs.markisha.vibeshuffle.utils.BeatUtils;
 import rs.markisha.vibeshuffle.utils.PlaylistUtils;
 import rs.markisha.vibeshuffle.utils.callbacks.BeatDetailsListener;
 import rs.markisha.vibeshuffle.utils.callbacks.PlaybackDetailsListener;
+import rs.markisha.vibeshuffle.utils.callbacks.PlaybackStateListener;
 import rs.markisha.vibeshuffle.utils.database.DBHelper;
 import rs.markisha.vibeshuffle.utils.network.SpotifyController;
 import rs.markisha.vibeshuffle.viewmodels.PlayViewModel;
 
-public class PlayFragment extends Fragment implements PlaybackDetailsListener, BeatDetailsListener {
+public class PlayFragment extends Fragment implements PlaybackDetailsListener, PlaybackStateListener, BeatDetailsListener {
 
     private ToggleButton btnPlay;
     private ToggleButton btnVolume;
@@ -119,6 +119,8 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
             // goes to onPlaybackDetailsReceived
         });
 
+        spotifyController.checkCurrentPlaybackState(this);
+
         return view;
     }
 
@@ -160,6 +162,21 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
     }
 
     @Override
+    public void onPlaybackStateReceived(Playback playback) {
+        if (!playback.isPlaying())
+            return;
+//        if (model.getCurrentTrack() == null)
+//            return;
+        if (trackPlayingFragment != null)
+            return;
+
+        model.setCurrentTrack(playback.getTrack());
+//        btnPlay.setChecked(true);
+
+        loadTrackPlayingFragment();
+    }
+
+    @Override
     public void onPlaybackDetailsReceived(Playback playbackDetails, boolean isChecked) {
         if (isChecked) {
             if (!playbackDetails.isPlaying()) {
@@ -174,10 +191,10 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
                 }
 
                 // remove track playing fragment
-                if (trackPlayingFragment != null) {
-                    FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-                    transaction.remove(trackPlayingFragment);
-                    transaction.commit();
+                if (trackPlayingFragment != null && getActivity() != null) {
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .remove(trackPlayingFragment)
+                            .commit();
                 }
             }
         }
@@ -286,10 +303,12 @@ public class PlayFragment extends Fragment implements PlaybackDetailsListener, B
     }
 
     private void loadTrackPlayingFragment() {
-        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         trackPlayingFragment = TrackPlayingFragment.newInstance(model.getCurrentTrack());
-        transaction.replace(R.id.track_playing_container, trackPlayingFragment, "trackPlayingFragment");
-        transaction.commit();
+        if (getActivity() != null) {
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.track_playing_container, trackPlayingFragment, "trackPlayingFragment")
+                    .commit();
+        }
     }
 
 }
